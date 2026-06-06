@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cl72rh3sbl8td"
-path="res://.godot/imported/kichki.png-84db9d6b176ccd0d998ae2d920693ee7.ctex"
+uid="uid://684h7dhm4qqf"
+path="res://.godot/imported/bezinmodel.png-134efb2c25145d6f18588ce2c4b2d7b8.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://models/kichki.png"
-dest_files=["res://.godot/imported/kichki.png-84db9d6b176ccd0d998ae2d920693ee7.ctex"]
+source_file="res://models/bezinmodel.png"
+dest_files=["res://.godot/imported/bezinmodel.png-134efb2c25145d6f18588ce2c4b2d7b8.ctex"]
 
 [params]
 

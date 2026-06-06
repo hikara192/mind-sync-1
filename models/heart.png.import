@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://che12db38p27x"
-path="res://.godot/imported/pochechki.png-c6c65223261056cf7c6398ee19652d13.ctex"
+uid="uid://cpkwg3hjs61o5"
+path="res://.godot/imported/heart.png-2608d456c0908507020d390a583ad7cd.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://models/pochechki.png"
-dest_files=["res://.godot/imported/pochechki.png-c6c65223261056cf7c6398ee19652d13.ctex"]
+source_file="res://models/heart.png"
+dest_files=["res://.godot/imported/heart.png-2608d456c0908507020d390a583ad7cd.ctex"]
 
 [params]
 

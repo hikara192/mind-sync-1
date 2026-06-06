@@ -1,14 +1,16 @@
-[gd_scene load_steps=79 format=3 uid="uid://camtc1r2je20t"]
+[gd_scene load_steps=81 format=3 uid="uid://camtc1r2je20t"]
 
 [ext_resource type="Texture2D" uid="uid://cqme6jcb37dwd" path="res://models/chelovek.png" id="1_33cqm"]
 [ext_resource type="Script" uid="uid://c3qmr8tn77jfy" path="res://scene/game.gd" id="1_xwcet"]
 [ext_resource type="Texture2D" uid="uid://btucr74cdd6we" path="res://models/гейгей1.png" id="2_ll5lq"]
-[ext_resource type="Texture2D" uid="uid://cdki4iifilbs3" path="res://models/brainmodel.png" id="2_xwcet"]
-[ext_resource type="Texture2D" uid="uid://c8xibkcsgks84" path="res://models/heartmodel1.png" id="4_xwcet"]
-[ext_resource type="Texture2D" uid="uid://cl72rh3sbl8td" path="res://models/kichki.png" id="5_p1ry8"]
-[ext_resource type="Texture2D" uid="uid://w2ihus0c48mb" path="res://models/pyechonochka.png" id="5_qpk70"]
-[ext_resource type="Texture2D" uid="uid://che12db38p27x" path="res://models/pochechki.png" id="5_xlg7c"]
+[ext_resource type="Texture2D" uid="uid://dhigy57gumrxc" path="res://models/kishki.png" id="5_17rxn"]
+[ext_resource type="Texture2D" uid="uid://684h7dhm4qqf" path="res://models/bezinmodel.png" id="6_yq8tf"]
+[ext_resource type="Texture2D" uid="uid://cpkwg3hjs61o5" path="res://models/heart.png" id="7_yq8tf"]
+[ext_resource type="Texture2D" uid="uid://bflhlyour0bog" path="res://models/pechenmodel.png" id="8_yq8tf"]
 [ext_resource type="Texture2D" uid="uid://3lcsged74jup" path="res://models/news.png" id="9_17rxn"]
+[ext_resource type="Texture2D" uid="uid://bfbfsr54t3xcb" path="res://models/pochki.png" id="9_ym5sv"]
+[ext_resource type="Script" uid="uid://050oppbvqstx" path="res://scene/BloodStreamGame.gd" id="10_ym5sv"]
+[ext_resource type="Texture2D" uid="uid://bt7ieqbnlsvh8" path="res://icon.svg" id="10_yq8tf"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qpk70"]
 bg_color = Color(0.840549, 0.348523, 0.413861, 1)
@@ -470,13 +472,18 @@ animations = [{
 "speed": 30.0
 }]
 
-[node name="Gameplay" type="Node2D" node_paths=PackedStringArray("ticker_text", "clip_container", "log_text", "dna_label", "fade_overlay")]
+[node name="Gameplay" type="Node2D" node_paths=PackedStringArray("ticker_text", "clip_container", "log_text", "dna_label", "fade_overlay", "blood_stream_game", "intestines_button", "liver_button", "kidneys_button", "brain_button")]
 script = ExtResource("1_xwcet")
 ticker_text = NodePath("TickerBackground/ClipContainer/NewsFeed")
-clip_container = NodePath("TickerBackground/ClipContainer")
+clip_container = NodePath("InterfaceContainer")
 log_text = NodePath("LogPanel/LogText")
 dna_label = NodePath("InterfaceContainer/DnaLabel")
 fade_overlay = NodePath("FadeOverlay")
+blood_stream_game = NodePath("BloodStreamArea")
+intestines_button = NodePath("HumanSprite/IntestinesButton")
+liver_button = NodePath("HumanSprite/LiverButton")
+kidneys_button = NodePath("HumanSprite/KidneysButton")
+brain_button = NodePath("HumanSprite/BrainButton")
 
 [node name="Гейгей1" type="Sprite2D" parent="."]
 texture_filter = 1
@@ -555,6 +562,20 @@ offset_right = 1920.0
 offset_bottom = 1075.0
 color = Color(0, 0, 0, 1)
 
+[node name="BloodStreamArea" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 469.0
+offset_top = 611.0
+offset_right = 765.0
+offset_bottom = 912.0
+script = ExtResource("10_ym5sv")
+
+[node name="VirusSprite" type="Sprite2D" parent="BloodStreamArea"]
+position = Vector2(148, 258)
+scale = Vector2(0.554688, 0.445313)
+texture = ExtResource("10_yq8tf")
+
 [node name="HumanSprite" type="TextureRect" parent="."]
 texture_filter = 1
 offset_left = 33.0
@@ -563,53 +584,52 @@ offset_right = 454.0
 offset_bottom = 985.0
 texture = ExtResource("1_33cqm")
 
+[node name="IntestinesButton" type="TextureButton" parent="HumanSprite"]
+layout_mode = 0
+offset_left = 108.0
+offset_top = 329.0
+offset_right = 208.0
+offset_bottom = 429.0
+scale = Vector2(1.96091, 1.67294)
+texture_normal = ExtResource("5_17rxn")
+
 [node name="BrainButton" type="TextureButton" parent="HumanSprite"]
 layout_mode = 0
-offset_left = 152.0
-offset_top = 5.0
-offset_right = 202.0
-offset_bottom = 55.0
-scale = Vector2(2.24655, 2.01539)
-texture_normal = ExtResource("2_xwcet")
+offset_left = 125.0
+offset_top = -6.0
+offset_right = 225.0
+offset_bottom = 94.0
+scale = Vector2(1.5738, 1.35047)
+texture_normal = ExtResource("6_yq8tf")
 
 [node name="HeartButton" type="TextureButton" parent="HumanSprite"]
 layout_mode = 0
-offset_left = 137.0
-offset_top = 205.0
-offset_right = 187.0
-offset_bottom = 255.0
-scale = Vector2(1.48101, 1.34166)
-texture_normal = ExtResource("4_xwcet")
+offset_left = 203.0
+offset_top = 227.0
+offset_right = 303.0
+offset_bottom = 327.0
+scale = Vector2(0.998475, 0.868912)
+texture_normal = ExtResource("7_yq8tf")
 
 [node name="LiverButton" type="TextureButton" parent="HumanSprite"]
 layout_mode = 0
-offset_left = 226.0
-offset_top = 315.0
-offset_right = 2146.0
-offset_bottom = 2235.0
-scale = Vector2(0.0441676, 0.0459868)
-texture_normal = ExtResource("5_qpk70")
+offset_left = 122.0
+offset_top = 303.0
+offset_right = 222.0
+offset_bottom = 403.0
+texture_normal = ExtResource("8_yq8tf")
 
 [node name="KidneysButton" type="TextureButton" parent="HumanSprite"]
 layout_mode = 0
-offset_left = 135.0
-offset_top = 415.0
-offset_right = 235.0
-offset_bottom = 515.0
-scale = Vector2(1.45602, 0.689602)
-texture_normal = ExtResource("5_xlg7c")
+offset_left = 126.0
+offset_top = 390.0
+offset_right = 226.0
+offset_bottom = 490.0
+scale = Vector2(1.60775, 0.757722)
+texture_normal = ExtResource("9_ym5sv")
 
-[node name="IntestinesButton" type="TextureButton" parent="HumanSprite"]
-layout_mode = 0
-offset_left = 102.0
-offset_top = 303.0
-offset_right = 152.0
-offset_bottom = 353.0
-scale = Vector2(2.54653, 2.16498)
-texture_normal = ExtResource("5_p1ry8")
-
+[connection signal="pressed" from="HumanSprite/IntestinesButton" to="." method="_on_intestines_button_pressed"]
 [connection signal="pressed" from="HumanSprite/BrainButton" to="." method="_on_brain_button_pressed"]
 [connection signal="pressed" from="HumanSprite/HeartButton" to="." method="_on_heart_button_pressed"]
 [connection signal="pressed" from="HumanSprite/LiverButton" to="." method="_on_liver_button_pressed"]
 [connection signal="pressed" from="HumanSprite/KidneysButton" to="." method="_on_kidneys_button_pressed"]
-[connection signal="pressed" from="HumanSprite/IntestinesButton" to="." method="_on_intestines_button_pressed"]

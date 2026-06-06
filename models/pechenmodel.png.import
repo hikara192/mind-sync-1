@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c8xibkcsgks84"
-path="res://.godot/imported/heartmodel1.png-d7b7b1288d40b0169322b72f871b3784.ctex"
+uid="uid://bflhlyour0bog"
+path="res://.godot/imported/pechenmodel.png-954b113d36ea32e4158ab98f4ec99a86.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://models/heartmodel1.png"
-dest_files=["res://.godot/imported/heartmodel1.png-d7b7b1288d40b0169322b72f871b3784.ctex"]
+source_file="res://models/pechenmodel.png"
+dest_files=["res://.godot/imported/pechenmodel.png-954b113d36ea32e4158ab98f4ec99a86.ctex"]
 
 [params]
 

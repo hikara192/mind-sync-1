@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cdki4iifilbs3"
-path="res://.godot/imported/brainmodel.png-ff04c3b54cd6b10670b0630561a788ea.ctex"
+uid="uid://dhigy57gumrxc"
+path="res://.godot/imported/kishki.png-50800ed0f64d5d6a1367eea542cca9df.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://models/brainmodel.png"
-dest_files=["res://.godot/imported/brainmodel.png-ff04c3b54cd6b10670b0630561a788ea.ctex"]
+source_file="res://models/kishki.png"
+dest_files=["res://.godot/imported/kishki.png-50800ed0f64d5d6a1367eea542cca9df.ctex"]
 
 [params]
 
