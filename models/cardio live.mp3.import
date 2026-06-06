@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://baed0hravqbxl"
+path="res://.godot/imported/cardio live.mp3-97814326320cb4e1ba035ab74f4c0187.mp3str"
+
+[deps]
+
+source_file="res://models/cardio live.mp3"
+dest_files=["res://.godot/imported/cardio live.mp3-97814326320cb4e1ba035ab74f4c0187.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

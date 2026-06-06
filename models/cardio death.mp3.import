@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://dlpx1x3fek2gr"
+path="res://.godot/imported/cardio death.mp3-ac48d259335e80a1bde18ab55e09dbfc.mp3str"
+
+[deps]
+
+source_file="res://models/cardio death.mp3"
+dest_files=["res://.godot/imported/cardio death.mp3-ac48d259335e80a1bde18ab55e09dbfc.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4
