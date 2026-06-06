@@ -6,6 +6,7 @@ extends Node2D
 @export var log_text: RichTextLabel
 @export var dna_label: Label
 @export var fade_overlay: ColorRect
+@export var toggle_game_button: Button       # НОВАЯ КНОПКА: Вкл/Выкл мини-игры
 
 # --- СВЯЗЬ С НЕРВНОЙ СИСТЕМОЙ ---
 @export var nervous_system_sprite: TextureRect 
@@ -81,12 +82,22 @@ func _ready() -> void:
 	if nervous_system_sprite != null: nervous_system_sprite.modulate.a = 0.0 
 	if synapse_container != null: synapse_container.visible = false     
 		
-	# ПОДКЛЮЧЕНИЕ СИГНАЛОВ МИНИ-ИГРЫ
+	# Подключение сигналов мини-игры
 	if blood_stream_game != null:
 		if blood_stream_game.has_signal("dna_collected"):
 			blood_stream_game.dna_collected.connect(_on_mini_game_dna_collected)
 		if blood_stream_game.has_signal("leukocyte_hit"):
 			blood_stream_game.leukocyte_hit.connect(_on_mini_game_leukocyte_hit)
+		
+		# НА СТАРТЕ: Принудительно скрываем мини-игру, чтобы игрок открыл её сам
+		blood_stream_game.visible = false
+		blood_stream_game.set("is_active", false)
+		
+	if toggle_game_button != null:
+		toggle_game_button.text = "Открыть Кровоток"
+		# Подключаем клик по кнопке кодом, если ты не подключил в редакторе
+		if not toggle_game_button.pressed.is_connected(_on_toggle_game_button_pressed):
+			toggle_game_button.pressed.connect(_on_toggle_game_button_pressed)
 		
 	_update_ui_bars()
 	show_news("[color=red][СМИ]: ВОЗ объявляет о начале новой опасной пандемии.[/color]")
@@ -104,7 +115,7 @@ func _process(delta: float) -> void:
 		_animate_screen_fade()
 		return
 		
-	# Регенерация
+	# Регенерация характеристик носителя
 	rest_timer += delta
 	if rest_timer >= 6.0 and health < 100.0:
 		health = min(100.0, health + 0.4 * delta)
@@ -113,7 +124,7 @@ func _process(delta: float) -> void:
 	immunity = min(100.0, immunity + 2.2 * regen_boost * delta)
 	filtration = min(100.0, filtration + 0.5 * delta)
 	
-	# ИСПРАВЛЕННАЯ БЕЗОПАСНАЯ СИНХРОНИЗАЦИЯ ДАННЫХ С МИНИ-ИГРОЙ
+	# Безопасная синхронизация динамических параметров с мини-игрой
 	if blood_stream_game != null:
 		blood_stream_game.set("mind_control_ref", mind_control)
 		blood_stream_game.set("immunity_ref", immunity)
@@ -126,6 +137,24 @@ func _process(delta: float) -> void:
 	
 	_handle_heart_beat(delta)
 	_handle_news_ticker(delta)
+
+# --- НОВОЕ: ЛОГИКА ВКЛЮЧЕНИЯ / ВЫКЛЮЧЕНИЯ МИНИ-ИГРЫ ПО КНОПКЕ ---
+func _on_toggle_game_button_pressed() -> void:
+	if is_game_over or blood_stream_game == null: return
+	
+	# Инвертируем текущую видимость панели кровотока
+	var should_show = not blood_stream_game.visible
+	
+	blood_stream_game.visible = should_show
+	blood_stream_game.set("is_active", should_show) # Команда мини-игре спать/работать
+	
+	if toggle_game_button != null:
+		if should_show:
+			toggle_game_button.text = "Закрыть Кровоток"
+			add_combat_log("[color=darkred][СИСТЕМА]: Подключение к инъекционному порту установлено.[/color]")
+		else:
+			toggle_game_button.text = "Открыть Кровоток"
+			add_combat_log("[color=gray][СИСТЕМА]: Синхронизация с кровотоком приостановлена.[/color]")
 
 # --- 3. ОБРАБОТЧИКИ СИГНАЛОВ МИНИ-ИГРЫ ---
 func _on_mini_game_dna_collected() -> void:

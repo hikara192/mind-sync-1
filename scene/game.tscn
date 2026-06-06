@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://cqme6jcb37dwd" path="res://models/chelovek.png" id="1_33cqm"]
 [ext_resource type="Script" uid="uid://c3qmr8tn77jfy" path="res://scene/game.gd" id="1_xwcet"]
-[ext_resource type="Texture2D" uid="uid://btucr74cdd6we" path="res://models/гейгей1.png" id="2_ll5lq"]
+[ext_resource type="Texture2D" uid="uid://bs53ayd2e36sy" path="res://models/back.png" id="2_ym5sv"]
 [ext_resource type="Texture2D" uid="uid://dhigy57gumrxc" path="res://models/kishki.png" id="5_17rxn"]
 [ext_resource type="Texture2D" uid="uid://684h7dhm4qqf" path="res://models/bezinmodel.png" id="6_yq8tf"]
 [ext_resource type="Texture2D" uid="uid://cpkwg3hjs61o5" path="res://models/heart.png" id="7_yq8tf"]
@@ -485,11 +485,11 @@ liver_button = NodePath("HumanSprite/LiverButton")
 kidneys_button = NodePath("HumanSprite/KidneysButton")
 brain_button = NodePath("HumanSprite/BrainButton")
 
-[node name="Гейгей1" type="Sprite2D" parent="."]
+[node name="Back" type="Sprite2D" parent="."]
 texture_filter = 1
 position = Vector2(960, 540)
 scale = Vector2(5.48571, 5.4)
-texture = ExtResource("2_ll5lq")
+texture = ExtResource("2_ym5sv")
 
 [node name="InterfaceContainer" type="VBoxContainer" parent="."]
 offset_left = 2.0
@@ -530,7 +530,7 @@ bbcode_enabled = true
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 texture_filter = 1
-position = Vector2(1587, 134)
+position = Vector2(1419, 358)
 scale = Vector2(5.3, 4.055)
 sprite_frames = SubResource("SpriteFrames_k2cbn")
 animation = &"def"
@@ -539,10 +539,10 @@ frame_progress = 0.377323
 
 [node name="TickerBackground" type="PanelContainer" parent="."]
 clip_contents = true
-offset_left = 1253.0
-offset_top = 265.0
-offset_right = 1901.0
-offset_bottom = 302.0
+offset_left = 1084.0
+offset_top = 488.0
+offset_right = 1732.0
+offset_bottom = 525.0
 
 [node name="ClipContainer" type="Control" parent="TickerBackground"]
 clip_children = 1
@@ -628,8 +628,17 @@ offset_bottom = 490.0
 scale = Vector2(1.60775, 0.757722)
 texture_normal = ExtResource("9_ym5sv")
 
+[node name="ToggleGameButton" type="TextureButton" parent="."]
+offset_left = 802.0
+offset_top = 705.0
+offset_right = 930.0
+offset_bottom = 833.0
+scale = Vector2(0.229474, 0.22169)
+texture_normal = ExtResource("10_yq8tf")
+
 [connection signal="pressed" from="HumanSprite/IntestinesButton" to="." method="_on_intestines_button_pressed"]
 [connection signal="pressed" from="HumanSprite/BrainButton" to="." method="_on_brain_button_pressed"]
 [connection signal="pressed" from="HumanSprite/HeartButton" to="." method="_on_heart_button_pressed"]
 [connection signal="pressed" from="HumanSprite/LiverButton" to="." method="_on_liver_button_pressed"]
 [connection signal="pressed" from="HumanSprite/KidneysButton" to="." method="_on_kidneys_button_pressed"]
+[connection signal="pressed" from="ToggleGameButton" to="." method="_on_toggle_game_button_pressed"]

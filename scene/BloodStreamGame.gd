@@ -12,38 +12,43 @@ var immunity_ref: float = 100.0
 
 var spawn_timer: float = 0.0
 var active_cells: Array = []
-var is_active: bool = true
+
+# Переменная состояния с сеттером для мгновенной очистки ресурсов при скрытии
+var is_active: bool = true:
+	set(value):
+		is_active = value
+		if not is_active:
+			_clear_all_cells()
 
 func _ready() -> void:
 	mouse_filter = MouseFilter.MOUSE_FILTER_PASS
 	
-	# АВТОПОИСК: Если в инспекторе забыли перетащить узел, ищем его по имени!
+	# Автопоиск спрайта вируса по имени, если забыли привязать в инспекторе
 	if virus_node == null:
-		# Ищет внутри себя узел с именем VirusSprite. Регистр букв важен!
 		virus_node = find_child("VirusSprite", true, false) as Sprite2D
 		
 	if virus_node == null:
 		print("КРИТИЧЕСКАЯ ОШИБКА: Скрипт не смог найти узел вируса! Проверь имя узла в дереве сцены.")
 
 func _process(delta: float) -> void:
-	if not is_active: return
+	if not is_active: return # Если игра выключена кнопкой, ничего не обрабатываем!
 	_move_virus(delta)
 	_handle_spawning(delta)
 
 func _move_virus(delta: float) -> void:
 	if virus_node == null: return
 	
+	# Прямой опрос физического состояния клавиатуры
 	var direction = Vector2.ZERO
 	if Input.is_key_pressed(KEY_A) or Input.is_key_pressed(KEY_LEFT): direction.x -= 1
 	if Input.is_key_pressed(KEY_D) or Input.is_key_pressed(KEY_RIGHT): direction.x += 1
 	if Input.is_key_pressed(KEY_W) or Input.is_key_pressed(KEY_UP): direction.y -= 1
 	if Input.is_key_pressed(KEY_S) or Input.is_key_pressed(KEY_DOWN): direction.y += 1
 	
-	# Если нажата хоть одна кнопка — двигаем
 	if direction != Vector2.ZERO:
 		virus_node.position += direction.normalized() * virus_speed * delta
 	
-	# Ограничение движения строго в рамках панели
+	# Ограничение движения строго в рамках панели интерфейса
 	virus_node.position.x = clamp(virus_node.position.x, 15, size.x - 15)
 	virus_node.position.y = clamp(virus_node.position.y, 15, size.y - 15)
 
@@ -59,23 +64,27 @@ func _spawn_cell() -> void:
 	img.fill(Color.WHITE)
 	cell.texture = ImageTexture.create_from_image(img)
 	
+	# Рост шанса спавна лейкоцитов в зависимости от иммунитета человека
 	var leukocyte_chance = 0.2 + (immunity_ref / 100.0 * 0.3)
 	var cell_type = "erythrocyte"
 	
 	if randf() < leukocyte_chance:
 		cell_type = "leukocyte"
-		cell.modulate = Color(1.0, 1.0, 2.0)
+		cell.modulate = Color(1.0, 1.0, 2.0) # Синеватый враждебный лейкоцит
 		cell.scale = Vector2(1.3, 1.3)
 	else:
-		cell.modulate = Color(2.0, 0.4, 0.4)
+		cell.modulate = Color(2.0, 0.4, 0.4) # Красный питательный эритроцит
 		
 	cell.position = Vector2(randf_range(15, size.x - 15), -10)
 	add_child(cell)
 	active_cells.append({"node": cell, "type": cell_type})
 
 func _notification(what: int) -> void:
+	# Узлы типа Control обновляют детей в нотификации, чтобы избежать рассинхронизации
 	if what == NOTIFICATION_PROCESS:
 		var to_remove = []
+		
+		# Скорость течения крови увеличивается по мере подчинения мозга
 		var speed_modifier = 1.0 + (mind_control_ref / 100.0)
 		var current_stream_speed = 180.0 * speed_modifier
 		
@@ -84,6 +93,7 @@ func _notification(what: int) -> void:
 			if is_instance_valid(node):
 				node.position.y += current_stream_speed * get_process_delta_time()
 				
+				# Проверка столкновения с вирусом
 				if virus_node and virus_node.position.distance_to(node.position) < 26.0:
 					if cell["type"] == "erythrocyte":
 						dna_collected.emit()
@@ -108,9 +118,12 @@ func _animate_flash(node: Node2D, flash_color: Color) -> void:
 	tween.tween_property(node, "modulate", flash_color, 0.05)
 	tween.tween_property(node, "modulate", Color(1, 1, 1), 0.1)
 
-func set_game_over() -> void:
-	is_active = false
+# Уничтожение всех активных клеток при закрытии интерфейса
+func _clear_all_cells() -> void:
 	for cell in active_cells:
 		if is_instance_valid(cell["node"]):
 			cell["node"].queue_free()
 	active_cells.clear()
+
+func set_game_over() -> void:
+	is_active = false

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://btucr74cdd6we"
-path="res://.godot/imported/гейгей1.png-f60767d397ba6a3b84123b8d74e4b18a.ctex"
+uid="uid://bs53ayd2e36sy"
+path="res://.godot/imported/back.png-2b81d42fa869249d8fab36330db0952e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://models/гейгей1.png"
-dest_files=["res://.godot/imported/гейгей1.png-f60767d397ba6a3b84123b8d74e4b18a.ctex"]
+source_file="res://models/back.png"
+dest_files=["res://.godot/imported/back.png-2b81d42fa869249d8fab36330db0952e.ctex"]
 
 [params]
 
