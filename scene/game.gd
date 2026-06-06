@@ -358,3 +358,4 @@ func show_news(text_message: String) -> void:
 	end_x = -ticker_text.get_content_width()
 	ticker_text.position.x = start_x
 	is_moving = true
+	print("hello")
