@@ -1,14 +1,17 @@
-[gd_scene load_steps=89 format=3 uid="uid://camtc1r2je20t"]
+[gd_scene load_steps=100 format=3 uid="uid://camtc1r2je20t"]
 
 [ext_resource type="Texture2D" uid="uid://cqme6jcb37dwd" path="res://models/chelovek.png" id="1_33cqm"]
 [ext_resource type="Script" uid="uid://c3qmr8tn77jfy" path="res://scene/game.gd" id="1_xwcet"]
 [ext_resource type="Texture2D" uid="uid://bs53ayd2e36sy" path="res://models/back.png" id="2_ym5sv"]
 [ext_resource type="Texture2D" uid="uid://ducdyf0uahy6m" path="res://models/LOGS MON.png" id="3_81276"]
-[ext_resource type="Texture2D" uid="uid://bdnvvc7nva5sk" path="res://models/TV.png" id="4_sng2h"]
+[ext_resource type="Texture2D" uid="uid://b4xjmvgipcpik" path="res://models/TV.png" id="4_sng2h"]
 [ext_resource type="Texture2D" uid="uid://dhigy57gumrxc" path="res://models/kishki.png" id="5_17rxn"]
 [ext_resource type="Texture2D" uid="uid://684h7dhm4qqf" path="res://models/bezinmodel.png" id="6_yq8tf"]
+[ext_resource type="PackedScene" uid="uid://bg5qg4w7ot6h2" path="res://scene/Erythrocyte.tscn" id="7_0lu6w"]
 [ext_resource type="Texture2D" uid="uid://drcx51c5q20qa" path="res://models/VIRUS.png" id="7_81276"]
 [ext_resource type="Texture2D" uid="uid://cpkwg3hjs61o5" path="res://models/heart.png" id="7_yq8tf"]
+[ext_resource type="PackedScene" uid="uid://com3lmay3vjh4" path="res://scene/Antibody.tscn" id="8_i6gbm"]
+[ext_resource type="Texture2D" uid="uid://uptf8ufdqeoa" path="res://models/venom.png" id="8_ux4dc"]
 [ext_resource type="Texture2D" uid="uid://bflhlyour0bog" path="res://models/pechenmodel.png" id="8_yq8tf"]
 [ext_resource type="Texture2D" uid="uid://3lcsged74jup" path="res://models/news.png" id="9_17rxn"]
 [ext_resource type="Texture2D" uid="uid://bfbfsr54t3xcb" path="res://models/pochki.png" id="9_ym5sv"]
@@ -475,6 +478,56 @@ animations = [{
 "speed": 30.0
 }]
 
+[sub_resource type="Gradient" id="Gradient_i6gbm"]
+offsets = PackedFloat32Array(0.993506, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_ux4dc"]
+gradient = SubResource("Gradient_i6gbm")
+width = 247
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ckp4v"]
+atlas = ExtResource("8_ux4dc")
+region = Rect2(0, 0, 86, 60)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_anyr7"]
+atlas = ExtResource("8_ux4dc")
+region = Rect2(86, 0, 86, 60)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ttaya"]
+atlas = ExtResource("8_ux4dc")
+region = Rect2(172, 0, 86, 60)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ll3i0"]
+atlas = ExtResource("8_ux4dc")
+region = Rect2(258, 0, 86, 60)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_oaewx"]
+atlas = ExtResource("8_ux4dc")
+region = Rect2(344, 0, 86, 60)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_v2qj1"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ckp4v")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_anyr7")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ttaya")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ll3i0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_oaewx")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
 [sub_resource type="AtlasTexture" id="AtlasTexture_k2cbn"]
 atlas = ExtResource("7_81276")
 region = Rect2(0, 0, 100, 100)
@@ -608,27 +661,44 @@ offset_right = 1920.0
 offset_bottom = 1075.0
 color = Color(0, 0, 0, 1)
 
+[node name="TextureRect" type="TextureRect" parent="."]
+offset_left = 575.0
+offset_top = 610.0
+offset_right = 903.0
+offset_bottom = 866.0
+texture = SubResource("GradientTexture1D_ux4dc")
+
+[node name="BloodStreamArea" type="Control" parent="." node_paths=PackedStringArray("virus_node")]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 575.0
+offset_top = 610.0
+offset_right = 888.0
+offset_bottom = 849.0
+script = ExtResource("10_ym5sv")
+virus_node = NodePath("VirusSprite")
+erythrocyte_scene = ExtResource("7_0lu6w")
+antibody_scene = ExtResource("8_i6gbm")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="BloodStreamArea"]
+position = Vector2(162, 122)
+scale = Vector2(3.69767, 4.26667)
+sprite_frames = SubResource("SpriteFrames_v2qj1")
+autoplay = "default"
+frame_progress = 0.928582
+
+[node name="VirusSprite" type="AnimatedSprite2D" parent="BloodStreamArea"]
+texture_filter = 1
+position = Vector2(120, 164)
+scale = Vector2(0.66, 0.65)
+sprite_frames = SubResource("SpriteFrames_ckp4v")
+autoplay = "default"
+
 [node name="Tv" type="Sprite2D" parent="."]
 texture_filter = 1
 position = Vector2(726.25, 785.25)
 scale = Vector2(3.29667, 3.44333)
 texture = ExtResource("4_sng2h")
-
-[node name="BloodStreamArea" type="Control" parent="."]
-layout_mode = 3
-anchors_preset = 0
-offset_left = 587.0
-offset_top = 616.0
-offset_right = 878.0
-offset_bottom = 850.0
-script = ExtResource("10_ym5sv")
-
-[node name="VirusSprite" type="AnimatedSprite2D" parent="BloodStreamArea"]
-texture_filter = 1
-position = Vector2(139, 191.5)
-scale = Vector2(0.66, 0.65)
-sprite_frames = SubResource("SpriteFrames_ckp4v")
-autoplay = "default"
 
 [node name="HumanSprite" type="TextureRect" parent="."]
 texture_filter = 1

@@ -1,0 +1,22 @@
+[gd_scene load_steps=4 format=3 uid="uid://com3lmay3vjh4"]
+
+[ext_resource type="Texture2D" uid="uid://kc8623e8t5av" path="res://models/antitel.png" id="1_jlkok"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gklgt"]
+atlas = ExtResource("1_jlkok")
+region = Rect2(0, 0, 70, 70)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_qr6rc"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_gklgt")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[node name="Antibody" type="AnimatedSprite2D"]
+scale = Vector2(0.742857, 0.742857)
+sprite_frames = SubResource("SpriteFrames_qr6rc")

@@ -1,0 +1,23 @@
+[gd_scene load_steps=4 format=3 uid="uid://bg5qg4w7ot6h2"]
+
+[ext_resource type="Texture2D" uid="uid://bsbhe1435e8l7" path="res://models/erritr.png" id="1_o1w8e"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_i152a"]
+atlas = ExtResource("1_o1w8e")
+region = Rect2(0, 0, 70, 70)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_c2u7s"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_i152a")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[node name="Erythrocyte" type="AnimatedSprite2D"]
+position = Vector2(4.76837e-07, 0)
+scale = Vector2(0.571429, 0.542857)
+sprite_frames = SubResource("SpriteFrames_c2u7s")

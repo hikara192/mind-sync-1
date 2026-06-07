@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b4xjmvgipcpik"
-path="res://.godot/imported/TV.png-922c450dd52936f48a5353e79fe769c7.ctex"
+uid="uid://uptf8ufdqeoa"
+path="res://.godot/imported/venom.png-a09d658ae1ece16667513bcc7dfa181d.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://models/TV.png"
-dest_files=["res://.godot/imported/TV.png-922c450dd52936f48a5353e79fe769c7.ctex"]
+source_file="res://models/venom.png"
+dest_files=["res://.godot/imported/venom.png-a09d658ae1ece16667513bcc7dfa181d.ctex"]
 
 [params]
 
