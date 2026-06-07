@@ -603,13 +603,14 @@ animations = [{
 "speed": 5.0
 }]
 
-[node name="Gameplay" type="Node2D" node_paths=PackedStringArray("ticker_text", "clip_container", "log_text", "dna_label", "fade_overlay", "bg_music_player", "cough_player", "blood_stream_game", "intestines_button", "liver_button", "kidneys_button", "brain_button")]
+[node name="Gameplay" type="Node2D" node_paths=PackedStringArray("ticker_text", "clip_container", "log_text", "dna_label", "fade_overlay", "credits_label", "bg_music_player", "cough_player", "blood_stream_game", "intestines_button", "liver_button", "kidneys_button", "brain_button")]
 script = ExtResource("1_xwcet")
 ticker_text = NodePath("TickerBackground/ClipContainer/NewsFeed")
 clip_container = NodePath("UI/Control/InterfaceContainer")
 log_text = NodePath("LogPanel/LogText")
 dna_label = NodePath("UI/Control/InterfaceContainer/DnaLabel")
 fade_overlay = NodePath("FadeOverlay")
+credits_label = NodePath("credits_label")
 bg_music_player = NodePath("BackgroundMusic")
 cough_player = NodePath("CoughPlayer")
 blood_stream_game = NodePath("BloodStreamArea")
@@ -739,18 +740,17 @@ theme_override_font_sizes/normal_font_size = 18
 theme_override_font_sizes/bold_font_size = 18
 scroll_following = true
 
-[node name="FadeOverlay" type="ColorRect" parent="."]
-visible = false
-offset_right = 1920.0
-offset_bottom = 1075.0
-color = Color(0, 0, 0, 1)
-
 [node name="TextureRect" type="TextureRect" parent="."]
 offset_left = 575.0
 offset_top = 610.0
 offset_right = 903.0
 offset_bottom = 866.0
 texture = SubResource("GradientTexture1D_ux4dc")
+
+[node name="FadeOverlay" type="ColorRect" parent="."]
+offset_right = 1920.0
+offset_bottom = 1075.0
+color = Color(0, 0, 0, 1)
 
 [node name="BloodStreamArea" type="Control" parent="." node_paths=PackedStringArray("virus_node")]
 layout_mode = 3
@@ -852,6 +852,13 @@ volume_db = -23.71
 [node name="BackgroundMusic" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("19_jhlss")
 volume_db = -24.361
+
+[node name="credits_label" type="RichTextLabel" parent="."]
+offset_left = 578.0
+offset_top = 314.0
+offset_right = 1469.0
+offset_bottom = 471.0
+bbcode_enabled = true
 
 [connection signal="pressed" from="HumanSprite/IntestinesButton" to="." method="_on_intestines_button_pressed"]
 [connection signal="pressed" from="HumanSprite/BrainButton" to="." method="_on_brain_button_pressed"]

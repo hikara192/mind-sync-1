@@ -7,6 +7,7 @@ extends Node2D
 @export var dna_label: Label
 @export var fade_overlay: ColorRect
 @export var toggle_game_button: Button        
+@export var credits_label: RichTextLabel  # Переменная для титров по центру
 
 # --- AUDIO SYSTEM CONNECTIONS ---
 @export var bg_music_player: AudioStreamPlayer 
@@ -39,7 +40,7 @@ var heart_button: TextureButton
 var health: float = 100.0
 var immunity: float = 100.0      
 var filtration: float = 100.0
-var mind_control: float = 0.0
+var mind_control: float = 98.0  # Оставлено для быстрого теста финала
 var dna_points: int = 10         
 var rest_timer: float = 0.0      
 
@@ -67,7 +68,7 @@ var news_timer: float = 0.0
 var cough_check_timer: float = 0.0 
 
 # --- BRAIN OVERHAUL VARIABLES ---
-var bbb_resistance: float = 0.0       # Current Blood-Brain Barrier resistance (0.0 to 1.0)
+var bbb_resistance: float = 0.0       # Триггер щита барьера: 0.0 - выключен, 1.0 - активен
 var panic_mode_active: bool = false   # Host panic state
 var panic_timer: float = 0.0          # Panic duration countdown
 
@@ -98,6 +99,10 @@ func _ready() -> void:
 	if fade_overlay != null: fade_overlay.modulate.a = 0.0
 	if nervous_system_sprite != null: nervous_system_sprite.modulate.a = 0.0 
 	if synapse_container != null: synapse_container.visible = false     
+	
+	if credits_label != null:
+		credits_label.text = ""
+		credits_label.visible = false
 	
 	if bg_music_player != null and not bg_music_player.playing:
 		bg_music_player.play()
@@ -131,10 +136,6 @@ func _process(delta: float) -> void:
 		add_combat_log("[color=red][FAILURE]: Host died of organ failure. You lost.[/color]")
 		_animate_screen_fade()
 		return
-		
-	# Decay Brain Barrier resistance over time
-	if bbb_resistance > 0.0:
-		bbb_resistance = max(0.0, bbb_resistance - 0.15 * delta)
 		
 	# Handle host panic state during brain assault
 	if panic_mode_active:
@@ -262,7 +263,7 @@ func _on_kidneys_button_pressed() -> void:
 	_animate_button_flash(kidneys_button, Color(1.5, 0.5, 0.5))
 	_update_ui_bars()
 
-# --- COMPLEX & DYNAMIC BRAIN INVASION ---
+# --- УПРОЩЕННАЯ И ПОНЯТНАЯ АТАКА НА МОЗГ ---
 func _on_brain_button_pressed() -> void:
 	if is_game_over: return
 	rest_timer = 0.0
@@ -272,43 +273,35 @@ func _on_brain_button_pressed() -> void:
 		add_combat_log("[color=gray]Not enough DNA! Requires 12 PTS.[/color]")
 		return
 		
-	# Check host active biological defenses
-	if immunity > 70.0 or filtration > 70.0:
-		dna_points = max(0, dna_points - 6)
-		add_combat_log("[color=crimson][WARNING]: Brain defense too high! Immune barrier incinerated -6 DNA.[/color]")
-		_animate_button_flash(brain_button, Color(1, 0, 0))
-		_update_ui_bars()
-		return
-		
 	dna_points -= brain_cost
 	health = max(0.0, health - 2.0)
 	
-	# Calculate progress penalty based on Blood-Brain Barrier (BBB) spam resistance
-	var base_attack = 3.0 
-	var bbb_penalty = 1.0 - (bbb_resistance * 0.75) 
+	var progress = 5.0 
 	
-	var immunity_resistance = (100.0 - immunity) / 100.0 
-	var filtration_bonus = (100.0 - filtration) * 0.06
-	
-	var progress = (base_attack + (12.0 * immunity_resistance) + filtration_bonus) * bbb_penalty
+	if immunity > 50.0:
+		progress -= 1.5
+		
+	if bbb_resistance > 0.0:
+		progress = progress * 0.5
+		bbb_resistance = 0.0
+		add_combat_log("[color=orange][BRAIN]: Гемато-энцефалический барьер пробит![/color]")
+	else:
+		bbb_resistance = 1.0 
+		
 	mind_control = min(100.0, mind_control + progress)
 	
-	# Accumulate barrier defense spike
-	bbb_resistance = min(1.0, bbb_resistance + 0.35)
-	
-	add_combat_log("[color=purple][BRAIN INVASION][/color] Progress: +" + str(snapped(progress, 0.1)) + "% (BBB Block: " + str(int(bbb_resistance * 100)) + "%)")
+	add_combat_log("[color=purple][BRAIN INVASION][/color] Progress: +" + str(progress) + "%. Следующий удар встретит сопротивление барьера!")
 	_animate_button_flash(brain_button, Color(1.8, 0.5, 1.8))
 	
-	# Trigger host psychological panic counter-attack
-	if mind_control > 40.0 and not panic_mode_active and randf() < 0.4:
+	if mind_control > 40.0 and not panic_mode_active and randf() < 0.3:
 		panic_mode_active = true
-		panic_timer = 5.0 
+		panic_timer = 4.0 
 		add_combat_log("[color=red][CRITICAL]: Neural panic triggered! Host's heart rate destabilized![/color]")
 	
 	if nervous_system_sprite != null:
 		var target_alpha = mind_control / 100.0
 		var tween = create_tween()
-		tween.tween_property(nervous_system_sprite, "modulate:a", target_alpha, 0.5)
+		tween.tween_property(nervous_system_sprite, "modulate:a", target_alpha, 0.3)
 
 	if mind_control >= 25.0 and synapse_container != null and not synapse_container.visible:
 		synapse_container.visible = true
@@ -321,8 +314,8 @@ func _on_brain_button_pressed() -> void:
 func _on_heart_button_pressed() -> void:
 	if is_game_over: return
 	if is_heart_striking:
-		dna_points += 1 # MODIFIED: Reward is now 1 DNA point instead of 4
-		add_combat_log("[color=green][PULSE]: Synchronization! +1 DNA.[/color]")
+		dna_points += 2
+		add_combat_log("[color=green][PULSE]: Synchronization! +2 DNA.[/color]")
 		_animate_button_flash(heart_button, Color(2, 1, 1))
 	else:
 		dna_points = max(0, dna_points - 3) 
@@ -363,12 +356,10 @@ func _update_ui_bars() -> void:
 func _handle_heart_beat(delta: float) -> void:
 	var danger_factor = (100.0 - health) / 100.0
 	
-	# In panic mode, force heart rate to maximum speed instantly
 	if panic_mode_active:
 		heart_beat_interval = MAX_HEART_INTERVAL
 		hit_window = BASE_HIT_WINDOW * 0.45
 	else:
-		# Remap interval seamlessly based on danger factor
 		heart_beat_interval = remap(danger_factor, 0.0, 1.0, BASE_HEART_INTERVAL, MAX_HEART_INTERVAL)
 		hit_window = remap(danger_factor, 0.0, 1.0, BASE_HIT_WINDOW, BASE_HIT_WINDOW * 0.45)
 	
@@ -425,7 +416,7 @@ func _check_game_conditions() -> void:
 			blood_stream_game.set_game_over()
 		
 		_update_ui_bars()
-		_start_cinematic_finale() # Trigger biological submission finale
+		_start_cinematic_finale()
 
 # CINEMATIC BIOLOGICAL FINALE
 func _start_cinematic_finale() -> void:
@@ -435,14 +426,12 @@ func _start_cinematic_finale() -> void:
 	if ticker_text != null:
 		create_tween().tween_property(ticker_text, "modulate:a", 0.0, 1.5)
 	
-	# Turn all organ nodes into the virus's signature color shade and disable them
 	var buttons = [intestines_button, liver_button, kidneys_button, brain_button, heart_button]
 	for btn in buttons:
 		if btn != null:
 			btn.disabled = true
 			create_tween().tween_property(btn, "modulate", Color(0.5, 0.1, 0.6), 2.0)
 	
-	# Linear fade out of the ambient musical layer
 	if bg_music_player != null:
 		create_tween().tween_property(bg_music_player, "volume_db", -80.0, 3.0)
 	
@@ -451,7 +440,6 @@ func _start_cinematic_finale() -> void:
 	if log_text != null:
 		log_text.text = ""
 	
-	# Sequential printing of the host's terminal thoughts
 	var final_thoughts = [
 		"[color=darkgray]The noise in my head... it's finally gone.[/color]",
 		"[color=darkgray]The thoughts aren't mine anymore. But they are so beautiful.[/color]",
@@ -465,8 +453,13 @@ func _start_cinematic_finale() -> void:
 	
 	_animate_screen_fade()
 
+# ОБНОВЛЕННАЯ ЛОГИКА ОВЕРЛЕЯ И ЗАПУСКА ТИТРОВ ПО ЦЕНТРУ
 func _animate_screen_fade() -> void:
 	if fade_overlay == null: return
+	
+	if credits_label != null:
+		credits_label.text = ""
+		credits_label.visible = false
 	
 	var tween = create_tween()
 	tween.tween_property(fade_overlay, "modulate:a", 1.0, 4.0)
@@ -474,7 +467,43 @@ func _animate_screen_fade() -> void:
 	tween.tween_callback(func():
 		if bg_music_player != null: bg_music_player.stop()
 		if cough_player != null: cough_player.stop()
+		
+		_run_post_game_credits()
 	)
+
+# НАДЕЖНАЯ ФУНКЦИЯ ДЛЯ ТИТРОВ ЧЕРЕЗ ЦЕПОЧКУ TWEEN (БЕЗ КОНФЛИКТНЫХ AWAIT)
+func _run_post_game_credits() -> void:
+	if credits_label == null: return
+	
+	credits_label.visible = true
+	credits_label.bbcode_enabled = true
+	credits_label.modulate.a = 0.0
+	
+	var post_credits_lines = [
+		"[center][color=gray]Пациент №1 — Психическая активность стабилизирована.[/color][/center]",
+		"[center][color=gray]Симптомы заражения полностью замаскированы.[/color][/center]",
+		"[center][color=purple]Функции высшей нервной деятельности переданы Патогену.[/color][/center]",
+		"[center][color=purple]Субъект больше не принадлежит самому себе.[/color][/center]",
+		"[center][color=purple]Он открывает дверь и выходит на улицу.[/color][/center]",
+		"[center][color=purple]Он готов распространять Нас дальше.[/color][/center]",
+		"[center][color=red]ЭВОЛЮЦИЯ НАЧАЛАСЬ.[/color][/center]"
+	]
+	
+	var story_tween = create_tween()
+	
+	for line in post_credits_lines:
+		story_tween.tween_callback(func(): 
+			credits_label.text = line
+		)
+		story_tween.tween_property(credits_label, "modulate:a", 1.0, 0.6)
+		story_tween.tween_interval(2.5)
+		story_tween.tween_property(credits_label, "modulate:a", 0.0, 0.6)
+		story_tween.tween_interval(0.3)
+		
+	story_tween.tween_callback(func():
+		credits_label.text = "[center][color=darkgray]- КОНЕЦ ИГРЫ -[/color][/center]"
+	)
+	story_tween.tween_property(credits_label, "modulate:a", 1.0, 1.5)
 
 func generate_random_news() -> void:
 	var raw = background_news.pick_random()
