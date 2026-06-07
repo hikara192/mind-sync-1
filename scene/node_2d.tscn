@@ -34,7 +34,7 @@ length = 0.001
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("FadeLayer:modulate")
+tracks/0/path = NodePath("Fade:modulate")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -50,7 +50,7 @@ length = 0.5
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("FadeLayer:modulate")
+tracks/0/path = NodePath("Fade:modulate")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -255,7 +255,7 @@ script = ExtResource("1_drhme")
 [node name="Transition" type="CanvasLayer" parent="."]
 layer = 100
 
-[node name="FadeLayer" type="ColorRect" parent="Transition"]
+[node name="Fade" type="ColorRect" parent="Transition"]
 modulate = Color(1, 1, 1, 0)
 anchors_preset = 15
 anchor_right = 1.0

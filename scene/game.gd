@@ -1,7 +1,5 @@
 extends Node2D
 
-@onready var animation_player = $TransitionLayer/AnimationPlayer
-
 # --- СВЯЗЬ С ИНТЕРФЕЙСОМ ---
 @export var ticker_text: RichTextLabel
 @export var clip_container: Control
@@ -73,7 +71,6 @@ var background_news = [
 
 # --- 1. СТАРТ И НАСТРОЙКА ИНТЕРФЕЙСА ---
 func _ready() -> void:
-	animation_player.play("fade_from_black")
 	await get_tree().process_frame
 	
 	health_bar = find_child("HealthBar", true, false) as ProgressBar
@@ -408,3 +405,4 @@ func show_news(text_message: String) -> void:
 	end_x = -ticker_text.get_content_width()
 	ticker_text.position.x = start_x
 	is_moving = true
+	print("1")

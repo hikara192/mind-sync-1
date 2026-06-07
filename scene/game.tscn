@@ -1,8 +1,4 @@
-<<<<<<< Updated upstream
-[gd_scene load_steps=103 format=3 uid="uid://camtc1r2je20t"]
-=======
-[gd_scene load_steps=102 format=3 uid="uid://camtc1r2je20t"]
->>>>>>> Stashed changes
+[gd_scene load_steps=105 format=3 uid="uid://camtc1r2je20t"]
 
 [ext_resource type="Texture2D" uid="uid://cqme6jcb37dwd" path="res://models/chelovek.png" id="1_33cqm"]
 [ext_resource type="Script" uid="uid://c3qmr8tn77jfy" path="res://scene/game.gd" id="1_xwcet"]
@@ -21,8 +17,8 @@
 [ext_resource type="Texture2D" uid="uid://bfbfsr54t3xcb" path="res://models/pochki.png" id="9_ym5sv"]
 [ext_resource type="Script" uid="uid://050oppbvqstx" path="res://scene/BloodStreamGame.gd" id="10_ym5sv"]
 [ext_resource type="Texture2D" uid="uid://c1wfm2w0qwklp" path="res://models/PLAY.png" id="13_5g16k"]
-[ext_resource type="AudioStream" uid="uid://cval0tpc2xvkh" path="res://models/untitled.mp3" id="18_ux4dc"]
-[ext_resource type="AudioStream" uid="uid://dw8y1iwaog6ko" path="res://models/kashel.mp3" id="19_jrd6n"]
+[ext_resource type="AudioStream" uid="uid://dw8y1iwaog6ko" path="res://models/kashel.mp3" id="18_jrd6n"]
+[ext_resource type="AudioStream" uid="uid://mxjg0p0hqybe" path="res://models/untitled.mp3" id="19_jhlss"]
 
 [sub_resource type="Animation" id="Animation_ux4dc"]
 length = 0.001
@@ -625,6 +621,7 @@ brain_button = NodePath("HumanSprite/BrainButton")
 layer = 100
 
 [node name="FadeRect" type="ColorRect" parent="TransitionLayer"]
+visible = false
 modulate = Color(0, 0, 0, 1)
 anchors_preset = 15
 anchor_right = 1.0
@@ -729,6 +726,12 @@ offset_right = 695.0
 offset_bottom = 260.0
 scroll_following = true
 
+[node name="FadeOverlay" type="ColorRect" parent="."]
+visible = false
+offset_right = 1920.0
+offset_bottom = 1075.0
+color = Color(0, 0, 0, 1)
+
 [node name="TextureRect" type="TextureRect" parent="."]
 offset_left = 575.0
 offset_top = 610.0
@@ -767,21 +770,6 @@ texture_filter = 1
 position = Vector2(726.25, 785.25)
 scale = Vector2(3.29667, 3.44333)
 texture = ExtResource("4_sng2h")
-
-[node name="FadeOverlay" type="ColorRect" parent="."]
-visible = false
-offset_right = 1920.0
-offset_bottom = 1075.0
-color = Color(0, 0, 0, 1)
-
-[node name="ToggleGameButton" type="TextureButton" parent="."]
-texture_filter = 1
-offset_left = 714.0
-offset_top = 869.0
-offset_right = 784.0
-offset_bottom = 919.0
-scale = Vector2(0.61433, 0.752733)
-texture_normal = ExtResource("13_5g16k")
 
 [node name="HumanSprite" type="TextureRect" parent="."]
 texture_filter = 1
@@ -828,24 +816,33 @@ texture_normal = ExtResource("8_yq8tf")
 
 [node name="KidneysButton" type="TextureButton" parent="HumanSprite"]
 layout_mode = 0
-offset_left = 124.0
-offset_top = 369.0
-offset_right = 224.0
-offset_bottom = 469.0
-scale = Vector2(1.65393, 0.930203)
+offset_left = 126.0
+offset_top = 374.0
+offset_right = 226.0
+offset_bottom = 474.0
+scale = Vector2(1.6482, 0.890835)
 texture_normal = ExtResource("9_ym5sv")
 
-[node name="BackgroundMusic" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("18_ux4dc")
-volume_db = -25.789
+[node name="ToggleGameButton" type="TextureButton" parent="."]
+texture_filter = 1
+offset_left = 714.0
+offset_top = 869.0
+offset_right = 784.0
+offset_bottom = 919.0
+scale = Vector2(0.61433, 0.752733)
+texture_normal = ExtResource("13_5g16k")
 
 [node name="CoughPlayer" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("19_jrd6n")
-volume_db = -24.36
+stream = ExtResource("18_jrd6n")
+volume_db = -23.71
 
-[connection signal="pressed" from="ToggleGameButton" to="." method="_on_toggle_game_button_pressed"]
+[node name="BackgroundMusic" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("19_jhlss")
+volume_db = -24.361
+
 [connection signal="pressed" from="HumanSprite/IntestinesButton" to="." method="_on_intestines_button_pressed"]
 [connection signal="pressed" from="HumanSprite/BrainButton" to="." method="_on_brain_button_pressed"]
 [connection signal="pressed" from="HumanSprite/HeartButton" to="." method="_on_heart_button_pressed"]
 [connection signal="pressed" from="HumanSprite/LiverButton" to="." method="_on_liver_button_pressed"]
 [connection signal="pressed" from="HumanSprite/KidneysButton" to="." method="_on_kidneys_button_pressed"]
+[connection signal="pressed" from="ToggleGameButton" to="." method="_on_toggle_game_button_pressed"]
