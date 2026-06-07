@@ -3,7 +3,7 @@ extends Control
 signal dna_collected
 signal leukocyte_hit
 
-@export var virus_node: Sprite2D
+@export var virus_node: AnimatedSprite2D
 @export var virus_speed: float = 300.0
 
 # Переменные связи, которые запрашивает главный менеджер
@@ -25,7 +25,7 @@ func _ready() -> void:
 	
 	# Автопоиск спрайта вируса по имени, если забыли привязать в инспекторе
 	if virus_node == null:
-		virus_node = find_child("VirusSprite", true, false) as Sprite2D
+		virus_node = find_child("VirusSprite", true, false) as AnimatedSprite2D
 		
 	if virus_node == null:
 		print("КРИТИЧЕСКАЯ ОШИБКА: Скрипт не смог найти узел вируса! Проверь имя узла в дереве сцены.")

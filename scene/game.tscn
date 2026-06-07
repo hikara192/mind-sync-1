@@ -1,16 +1,19 @@
-[gd_scene load_steps=81 format=3 uid="uid://camtc1r2je20t"]
+[gd_scene load_steps=89 format=3 uid="uid://camtc1r2je20t"]
 
 [ext_resource type="Texture2D" uid="uid://cqme6jcb37dwd" path="res://models/chelovek.png" id="1_33cqm"]
 [ext_resource type="Script" uid="uid://c3qmr8tn77jfy" path="res://scene/game.gd" id="1_xwcet"]
 [ext_resource type="Texture2D" uid="uid://bs53ayd2e36sy" path="res://models/back.png" id="2_ym5sv"]
+[ext_resource type="Texture2D" uid="uid://ducdyf0uahy6m" path="res://models/LOGS MON.png" id="3_81276"]
+[ext_resource type="Texture2D" uid="uid://bdnvvc7nva5sk" path="res://models/TV.png" id="4_sng2h"]
 [ext_resource type="Texture2D" uid="uid://dhigy57gumrxc" path="res://models/kishki.png" id="5_17rxn"]
 [ext_resource type="Texture2D" uid="uid://684h7dhm4qqf" path="res://models/bezinmodel.png" id="6_yq8tf"]
+[ext_resource type="Texture2D" uid="uid://drcx51c5q20qa" path="res://models/VIRUS.png" id="7_81276"]
 [ext_resource type="Texture2D" uid="uid://cpkwg3hjs61o5" path="res://models/heart.png" id="7_yq8tf"]
 [ext_resource type="Texture2D" uid="uid://bflhlyour0bog" path="res://models/pechenmodel.png" id="8_yq8tf"]
 [ext_resource type="Texture2D" uid="uid://3lcsged74jup" path="res://models/news.png" id="9_17rxn"]
 [ext_resource type="Texture2D" uid="uid://bfbfsr54t3xcb" path="res://models/pochki.png" id="9_ym5sv"]
 [ext_resource type="Script" uid="uid://050oppbvqstx" path="res://scene/BloodStreamGame.gd" id="10_ym5sv"]
-[ext_resource type="Texture2D" uid="uid://bt7ieqbnlsvh8" path="res://icon.svg" id="10_yq8tf"]
+[ext_resource type="Texture2D" uid="uid://c1wfm2w0qwklp" path="res://models/PLAY.png" id="13_5g16k"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qpk70"]
 bg_color = Color(0.840549, 0.348523, 0.413861, 1)
@@ -472,6 +475,42 @@ animations = [{
 "speed": 30.0
 }]
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_k2cbn"]
+atlas = ExtResource("7_81276")
+region = Rect2(0, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_60gyb"]
+atlas = ExtResource("7_81276")
+region = Rect2(100, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_eycuj"]
+atlas = ExtResource("7_81276")
+region = Rect2(200, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ntqlo"]
+atlas = ExtResource("7_81276")
+region = Rect2(300, 0, 100, 100)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_ckp4v"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_k2cbn")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_60gyb")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_eycuj")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ntqlo")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
 [node name="Gameplay" type="Node2D" node_paths=PackedStringArray("ticker_text", "clip_container", "log_text", "dna_label", "fade_overlay", "blood_stream_game", "intestines_button", "liver_button", "kidneys_button", "brain_button")]
 script = ExtResource("1_xwcet")
 ticker_text = NodePath("TickerBackground/ClipContainer/NewsFeed")
@@ -490,6 +529,12 @@ texture_filter = 1
 position = Vector2(960, 540)
 scale = Vector2(5.48571, 5.4)
 texture = ExtResource("2_ym5sv")
+
+[node name="LogsMon" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(591, 152)
+scale = Vector2(2.76, 2.43333)
+texture = ExtResource("3_81276")
 
 [node name="InterfaceContainer" type="VBoxContainer" parent="."]
 offset_left = 2.0
@@ -519,9 +564,10 @@ value = 100.0
 layout_mode = 2
 
 [node name="LogPanel" type="PanelContainer" parent="."]
-offset_left = 412.0
-offset_right = 749.0
-offset_bottom = 278.0
+offset_left = 419.0
+offset_top = 21.0
+offset_right = 756.0
+offset_bottom = 296.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_sng2h")
 
 [node name="LogText" type="RichTextLabel" parent="LogPanel"]
@@ -562,19 +608,27 @@ offset_right = 1920.0
 offset_bottom = 1075.0
 color = Color(0, 0, 0, 1)
 
+[node name="Tv" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(726.25, 785.25)
+scale = Vector2(3.29667, 3.44333)
+texture = ExtResource("4_sng2h")
+
 [node name="BloodStreamArea" type="Control" parent="."]
 layout_mode = 3
 anchors_preset = 0
-offset_left = 469.0
-offset_top = 611.0
-offset_right = 765.0
-offset_bottom = 912.0
+offset_left = 587.0
+offset_top = 616.0
+offset_right = 878.0
+offset_bottom = 850.0
 script = ExtResource("10_ym5sv")
 
-[node name="VirusSprite" type="Sprite2D" parent="BloodStreamArea"]
-position = Vector2(148, 258)
-scale = Vector2(0.554688, 0.445313)
-texture = ExtResource("10_yq8tf")
+[node name="VirusSprite" type="AnimatedSprite2D" parent="BloodStreamArea"]
+texture_filter = 1
+position = Vector2(139, 191.5)
+scale = Vector2(0.66, 0.65)
+sprite_frames = SubResource("SpriteFrames_ckp4v")
+autoplay = "default"
 
 [node name="HumanSprite" type="TextureRect" parent="."]
 texture_filter = 1
@@ -586,19 +640,19 @@ texture = ExtResource("1_33cqm")
 
 [node name="IntestinesButton" type="TextureButton" parent="HumanSprite"]
 layout_mode = 0
-offset_left = 108.0
-offset_top = 329.0
-offset_right = 208.0
-offset_bottom = 429.0
-scale = Vector2(1.96091, 1.67294)
+offset_left = 102.0
+offset_top = 314.0
+offset_right = 202.0
+offset_bottom = 414.0
+scale = Vector2(2.0893, 1.74044)
 texture_normal = ExtResource("5_17rxn")
 
 [node name="BrainButton" type="TextureButton" parent="HumanSprite"]
 layout_mode = 0
-offset_left = 125.0
-offset_top = -6.0
-offset_right = 225.0
-offset_bottom = 94.0
+offset_left = 129.0
+offset_top = -5.0
+offset_right = 229.0
+offset_bottom = 95.0
 scale = Vector2(1.5738, 1.35047)
 texture_normal = ExtResource("6_yq8tf")
 
@@ -622,19 +676,20 @@ texture_normal = ExtResource("8_yq8tf")
 [node name="KidneysButton" type="TextureButton" parent="HumanSprite"]
 layout_mode = 0
 offset_left = 126.0
-offset_top = 390.0
+offset_top = 374.0
 offset_right = 226.0
-offset_bottom = 490.0
-scale = Vector2(1.60775, 0.757722)
+offset_bottom = 474.0
+scale = Vector2(1.6482, 0.890835)
 texture_normal = ExtResource("9_ym5sv")
 
 [node name="ToggleGameButton" type="TextureButton" parent="."]
-offset_left = 802.0
-offset_top = 705.0
-offset_right = 930.0
-offset_bottom = 833.0
-scale = Vector2(0.229474, 0.22169)
-texture_normal = ExtResource("10_yq8tf")
+texture_filter = 1
+offset_left = 714.0
+offset_top = 869.0
+offset_right = 784.0
+offset_bottom = 919.0
+scale = Vector2(0.61433, 0.752733)
+texture_normal = ExtResource("13_5g16k")
 
 [connection signal="pressed" from="HumanSprite/IntestinesButton" to="." method="_on_intestines_button_pressed"]
 [connection signal="pressed" from="HumanSprite/BrainButton" to="." method="_on_brain_button_pressed"]
