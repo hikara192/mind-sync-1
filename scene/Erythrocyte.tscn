@@ -19,5 +19,5 @@ animations = [{
 
 [node name="Erythrocyte" type="AnimatedSprite2D"]
 position = Vector2(4.76837e-07, 0)
-scale = Vector2(0.571429, 0.542857)
+scale = Vector2(0.489781, 0.442442)
 sprite_frames = SubResource("SpriteFrames_c2u7s")

@@ -18,5 +18,5 @@ animations = [{
 }]
 
 [node name="Antibody" type="AnimatedSprite2D"]
-scale = Vector2(0.742857, 0.742857)
+scale = Vector2(0.484674, 0.435929)
 sprite_frames = SubResource("SpriteFrames_qr6rc")

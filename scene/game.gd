@@ -7,7 +7,7 @@ extends Node2D
 @export var dna_label: Label
 @export var fade_overlay: ColorRect
 @export var toggle_game_button: Button        
-@export var credits_label: RichTextLabel  # Переменная для титров по центру
+@export var credits_label: RichTextLabel  # Centered credits label variable
 
 # --- AUDIO SYSTEM CONNECTIONS ---
 @export var bg_music_player: AudioStreamPlayer 
@@ -40,7 +40,7 @@ var heart_button: TextureButton
 var health: float = 100.0
 var immunity: float = 100.0      
 var filtration: float = 100.0
-var mind_control: float = 98.0  # Оставлено для быстрого теста финала
+var mind_control: float = 98.0  # Left at 98% for quick testing of the finale
 var dna_points: int = 10         
 var rest_timer: float = 0.0      
 
@@ -53,7 +53,7 @@ var hit_window: float = 0.25
 var is_heart_striking: bool = false
 
 const BASE_HEART_INTERVAL: float = 0.9   
-const MAX_HEART_INTERVAL: float = 0.35    
+const MAX_HEART_INTERVAL: float = 0.35   
 const BASE_HIT_WINDOW: float = 0.25      
 
 var ui_update_timer: float = 0.0 
@@ -68,7 +68,7 @@ var news_timer: float = 0.0
 var cough_check_timer: float = 0.0 
 
 # --- BRAIN OVERHAUL VARIABLES ---
-var bbb_resistance: float = 0.0       # Триггер щита барьера: 0.0 - выключен, 1.0 - активен
+var bbb_resistance: float = 0.0       # Blood-Brain Barrier shield trigger: 0.0 - disabled, 1.0 - active
 var panic_mode_active: bool = false   # Host panic state
 var panic_timer: float = 0.0          # Panic duration countdown
 
@@ -96,7 +96,11 @@ func _ready() -> void:
 		log_text.bbcode_enabled = true
 		log_text.text = "[color=red][SYSTEM]: Biological threat deployed. Immune system at full combat readiness![/color]\n"
 		
-	if fade_overlay != null: fade_overlay.modulate.a = 0.0
+	if fade_overlay != null: 
+		fade_overlay.modulate.a = 0.0
+		# FIX: Clicks will now pass through the overlay to the organ buttons below
+		fade_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		
 	if nervous_system_sprite != null: nervous_system_sprite.modulate.a = 0.0 
 	if synapse_container != null: synapse_container.visible = false     
 	
@@ -134,18 +138,16 @@ func _process(delta: float) -> void:
 			blood_stream_game.set_game_over()
 		_update_ui_bars()
 		add_combat_log("[color=red][FAILURE]: Host died of organ failure. You lost.[/color]")
-		_animate_screen_fade()
+		_animate_screen_fade("death")
 		return
 		
-	# Handle host panic state during brain assault
 	if panic_mode_active:
 		panic_timer -= delta
-		health = min(100.0, health + 1.5 * delta) # Rapid adrenaline recovery
+		health = min(100.0, health + 1.5 * delta)
 		if panic_timer <= 0.0:
 			panic_mode_active = false
 			add_combat_log("[color=lightblue][BRAIN]: Host's neural panic subsided. Rhythms stabilizing.[/color]")
 		
-	# Host Body Regeneration
 	rest_timer += delta
 	if rest_timer >= 6.0 and health < 100.0:
 		health = min(100.0, health + 0.4 * delta)
@@ -185,7 +187,7 @@ func _handle_cough_logic(delta: float) -> void:
 			cough_player.play()
 			add_combat_log("[color=darkred][SYMPTOM]: Host experienced a severe coughing fit.[/color]")
 
-# --- BLOODSTREAM MINI-GAME TOGGLE SYSTEM ---
+# --- BLOODSTREAM MINI-GAME TOG SYSTEM ---
 func _on_toggle_game_button_pressed() -> void:
 	if is_game_over or blood_stream_game == null: return
 	
@@ -244,7 +246,7 @@ func _on_liver_button_pressed() -> void:
 	rest_timer = 0.0
 	dna_points -= cost
 	immunity = max(0.0, immunity - 30.0) 
-	health = max(0.0, health - 12.0)     
+	health = max(0.0, health - 12.0)      
 	add_combat_log("[color=orange][ATTACK: LIVER][/color] Toxic shock! Immunity -30%, HP -12.")
 	_animate_button_flash(liver_button, Color(1.5, 0.5, 0.5))
 	_update_ui_bars()
@@ -263,7 +265,7 @@ func _on_kidneys_button_pressed() -> void:
 	_animate_button_flash(kidneys_button, Color(1.5, 0.5, 0.5))
 	_update_ui_bars()
 
-# --- УПРОЩЕННАЯ И ПОНЯТНАЯ АТАКА НА МОЗГ ---
+# --- BRAIN ATTACK MECHANICS ---
 func _on_brain_button_pressed() -> void:
 	if is_game_over: return
 	rest_timer = 0.0
@@ -284,13 +286,13 @@ func _on_brain_button_pressed() -> void:
 	if bbb_resistance > 0.0:
 		progress = progress * 0.5
 		bbb_resistance = 0.0
-		add_combat_log("[color=orange][BRAIN]: Гемато-энцефалический барьер пробит![/color]")
+		add_combat_log("[color=orange][BRAIN]: Blood-Brain Barrier breached![/color]")
 	else:
 		bbb_resistance = 1.0 
 		
 	mind_control = min(100.0, mind_control + progress)
 	
-	add_combat_log("[color=purple][BRAIN INVASION][/color] Progress: +" + str(progress) + "%. Следующий удар встретит сопротивление барьера!")
+	add_combat_log("[color=purple][BRAIN INVASION][/color] Progress: +" + str(progress) + "%. Next strike will face barrier resistance!")
 	_animate_button_flash(brain_button, Color(1.8, 0.5, 1.8))
 	
 	if mind_control > 40.0 and not panic_mode_active and randf() < 0.3:
@@ -451,11 +453,14 @@ func _start_cinematic_finale() -> void:
 		add_combat_log(thought)
 		await get_tree().create_timer(2.0).timeout
 	
-	_animate_screen_fade()
+	_animate_screen_fade("victory")
 
-# ОБНОВЛЕННАЯ ЛОГИКА ОВЕРЛЕЯ И ЗАПУСКА ТИТРОВ ПО ЦЕНТРУ
-func _animate_screen_fade() -> void:
+# FADE OVERLAY LOGIC AND CREDIT SYSTEM DISPATCHER
+func _animate_screen_fade(reason: String) -> void:
 	if fade_overlay == null: return
+	
+	# FIX: Blocks clicks during end credits so player can't click things behind the black screen
+	fade_overlay.mouse_filter = Control.MOUSE_FILTER_STOP
 	
 	if credits_label != null:
 		credits_label.text = ""
@@ -468,26 +473,38 @@ func _animate_screen_fade() -> void:
 		if bg_music_player != null: bg_music_player.stop()
 		if cough_player != null: cough_player.stop()
 		
-		_run_post_game_credits()
+		_run_post_game_credits(reason)
 	)
 
-# НАДЕЖНАЯ ФУНКЦИЯ ДЛЯ ТИТРОВ ЧЕРЕЗ ЦЕПОЧКУ TWEEN (БЕЗ КОНФЛИКТНЫХ AWAIT)
-func _run_post_game_credits() -> void:
+# ROBUST CREDITS ANIMATION SYSTEM VIA TWEEN CHAINING
+func _run_post_game_credits(reason: String) -> void:
 	if credits_label == null: return
 	
 	credits_label.visible = true
 	credits_label.bbcode_enabled = true
 	credits_label.modulate.a = 0.0
 	
-	var post_credits_lines = [
-		"[center][color=gray]Пациент №1 — Психическая активность стабилизирована.[/color][/center]",
-		"[center][color=gray]Симптомы заражения полностью замаскированы.[/color][/center]",
-		"[center][color=purple]Функции высшей нервной деятельности переданы Патогену.[/color][/center]",
-		"[center][color=purple]Субъект больше не принадлежит самому себе.[/color][/center]",
-		"[center][color=purple]Он открывает дверь и выходит на улицу.[/color][/center]",
-		"[center][color=purple]Он готов распространять Нас дальше.[/color][/center]",
-		"[center][color=red]ЭВОЛЮЦИЯ НАЧАЛАСЬ.[/color][/center]"
-	]
+	var post_credits_lines = []
+	
+	if reason == "death":
+		post_credits_lines = [
+			"[center][color=red]The pathogen destroyed the host too quickly.[/color][/center]",
+			"[center][color=gray]Critical body systems have completely failed.[/color][/center]",
+			"[center][color=gray]Further recovery and resuscitation are impossible.[/color][/center]",
+			"[center][color=darkred]Neural impulses have faded. The brain is dead.[/color][/center]",
+			"[center][color=darkred]Along with the host, the pathogen itself perished.[/color][/center]",
+			"[center][color=red]MISSION FAILED.[/color][/center]"
+		]
+	else:
+		post_credits_lines = [
+			"[center][color=gray]Patient Zero — Mental activity stabilized.[/color][/center]",
+			"[center][color=gray]Symptoms of infection are completely masked.[/color][/center]",
+			"[center][color=purple]Higher nervous system functions transferred to the Pathogen.[/color][/center]",
+			"[center][color=purple]The subject no longer belongs to himself.[/color][/center]",
+			"[center][color=purple]He opens the door and steps outside onto the street.[/color][/center]",
+			"[center][color=purple]He is ready to spread Us further.[/color][/center]",
+			"[center][color=red]THE EVOLUTION HAS BEGUN.[/color][/center]"
+		]
 	
 	var story_tween = create_tween()
 	
@@ -501,7 +518,10 @@ func _run_post_game_credits() -> void:
 		story_tween.tween_interval(0.3)
 		
 	story_tween.tween_callback(func():
-		credits_label.text = "[center][color=darkgray]- КОНЕЦ ИГРЫ -[/color][/center]"
+		if reason == "death":
+			credits_label.text = "[center][color=red]- GAME OVER -[/color][/center]"
+		else:
+			credits_label.text = "[center][color=purple]- VICTORY -[/color][/center]"
 	)
 	story_tween.tween_property(credits_label, "modulate:a", 1.0, 1.5)
 
