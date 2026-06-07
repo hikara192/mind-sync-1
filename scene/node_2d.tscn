@@ -1,4 +1,4 @@
-[gd_scene load_steps=55 format=3 uid="uid://d05s3w2knao4l"]
+[gd_scene load_steps=58 format=3 uid="uid://d05s3w2knao4l"]
 
 [ext_resource type="Script" uid="uid://caq0vvxxw7fcf" path="res://scripts/mainmenu.gd" id="1_drhme"]
 [ext_resource type="Texture2D" uid="uid://dh4wwtvjytvgn" path="res://models/mainmenu/фон главный1.png" id="2_cw5uo"]
@@ -28,6 +28,43 @@
 [ext_resource type="Texture2D" uid="uid://dpykpeuj0fpag" path="res://models/mainmenu/фон главный24.png" id="25_0m7f8"]
 [ext_resource type="Texture2D" uid="uid://b70wkqst0mwyx" path="res://models/mainmenu/фон главный25.png" id="26_im0yt"]
 [ext_resource type="Texture2D" uid="uid://c1wfm2w0qwklp" path="res://models/PLAY.png" id="27_cw5uo"]
+
+[sub_resource type="Animation" id="Animation_x33gs"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Fade:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_cw5uo"]
+resource_name = "fade_to_black"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Fade:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(0, 0, 0, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_2paaw"]
+_data = {
+&"RESET": SubResource("Animation_x33gs"),
+&"fade_to_black": SubResource("Animation_cw5uo")
+}
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_onb7f"]
 atlas = ExtResource("2_cw5uo")
@@ -215,62 +252,87 @@ animations = [{
 [node name="Node2D" type="Node2D"]
 script = ExtResource("1_drhme")
 
+[node name="Transition" type="CanvasLayer" parent="."]
+layer = 100
+
+[node name="Fade" type="ColorRect" parent="Transition"]
+modulate = Color(1, 1, 1, 0)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Transition"]
+libraries = {
+&"": SubResource("AnimationLibrary_2paaw")
+}
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="Control" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="start" type="Button" parent="UI/Control"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 368.0
+offset_top = -345.0
+offset_right = 555.0
+offset_bottom = -284.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(2.28223, 2.784)
+text = "start"
+flat = true
+
+[node name="Start" type="Sprite2D" parent="UI/Control/start"]
+texture_filter = 1
+position = Vector2(93.2509, 31.0776)
+scale = Vector2(3.01428, 1.56)
+texture = ExtResource("27_cw5uo")
+
+[node name="exit" type="Button" parent="UI/Control"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 369.0
+offset_top = -31.0
+offset_right = 545.0
+offset_bottom = 35.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(2.39701, 2.49528)
+text = "exit
+"
+flat = true
+
+[node name="Exit" type="Sprite2D" parent="UI/Control/exit"]
+texture_filter = 1
+position = Vector2(87.9178, 33.4007)
+scale = Vector2(2.84286, 1.68)
+texture = ExtResource("3_3cebx")
+
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 position = Vector2(962, 539)
 sprite_frames = SubResource("SpriteFrames_o1eqh")
 autoplay = "default"
 frame_progress = 0.0282996
 
-[node name="Control" type="Control" parent="."]
-layout_mode = 3
-anchors_preset = 0
-offset_right = 1920.0
-offset_bottom = 1080.0
-
-[node name="start" type="Button" parent="Control"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = 382.0
-offset_top = -335.0
-offset_right = 556.0
-offset_bottom = -280.0
-grow_horizontal = 2
-grow_vertical = 2
-scale = Vector2(2.28223, 2.784)
-text = "start"
-
-[node name="Start" type="Sprite2D" parent="Control"]
-texture_filter = 1
-position = Vector2(1540.82, 281.52)
-scale = Vector2(6.87929, 4.34304)
-texture = ExtResource("27_cw5uo")
-
-[node name="exit" type="Button" parent="Control"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = 378.0
-offset_top = -27.0
-offset_right = 547.0
-offset_bottom = 34.0
-grow_horizontal = 2
-grow_vertical = 2
-scale = Vector2(2.39701, 2.49528)
-text = "exit
-"
-
-[node name="Exit" type="Sprite2D" parent="Control"]
-texture_filter = 1
-position = Vector2(1539.74, 592.344)
-scale = Vector2(6.81437, 4.19207)
-texture = ExtResource("3_3cebx")
-
-[connection signal="pressed" from="Control/start" to="." method="_on_start_pressed"]
-[connection signal="pressed" from="Control/exit" to="." method="_on_exit_pressed"]
+[connection signal="pressed" from="UI/Control/start" to="." method="_on_start_pressed"]
+[connection signal="pressed" from="UI/Control/exit" to="." method="_on_exit_pressed"]
