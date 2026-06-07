@@ -6,36 +6,36 @@ extends Node2D
 @export var log_text: RichTextLabel
 @export var dna_label: Label
 @export var fade_overlay: ColorRect
-@export var toggle_game_button: Button       
+@export var toggle_game_button: Button        
 
-# --- СВЯЗЬ С ЗВУКОВОЙ СИСТЕМОЙ ---
+# --- AUDIO SYSTEM CONNECTIONS ---
 @export var bg_music_player: AudioStreamPlayer 
-@export var cough_player: AudioStreamPlayer    # НОВЫЙ ПЛЕЕР: Для звуков кашля
+@export var cough_player: AudioStreamPlayer    
 
-# --- СВЯЗЬ С НЕРВНОЙ СИСТЕМОЙ ---
+# --- NERVOUS SYSTEM CONNECTIONS ---
 @export var nervous_system_sprite: TextureRect 
 @export var synapse_container: Control        
 
-# --- УЗЕЛ МИНИ-ИГРЫ КРОВОТОКА ---
+# --- BLOODSTREAM MINI-GAME NODE ---
 @export var blood_stream_game: Control
 
-# Узлы интерфейса
+# UI Nodes
 var health_bar: ProgressBar
 var mind_bar: ProgressBar
 var immunity_bar: ProgressBar 
 var heart_button: TextureButton
 
-# Кнопки остальных органов
+# Other Organ Buttons
 @export var intestines_button: TextureButton
 @export var liver_button: TextureButton
 @export var kidneys_button: TextureButton
 @export var brain_button: TextureButton
 
-# --- НАСТРОЙКИ БЕГУЩЕЙ СТРОКИ ---
+# --- TICKER SETTINGS ---
 @export var ticker_speed: float = 160.0
 @export var news_interval: float = 7.0
 
-# --- ХАРАКТЕРИСТИКИ ЧЕЛОВЕКА ---
+# --- HOST CHARACTERISTICS ---
 var health: float = 100.0
 var immunity: float = 100.0      
 var filtration: float = 100.0
@@ -45,31 +45,40 @@ var rest_timer: float = 0.0
 
 var is_game_over: bool = false
 
-# --- ПЕРЕМЕННЫЕ ДЛЯ МЕХАНИКИ ПУЛЬСА ---
+# --- HEARTBEAT MECHANICS VARIABLES ---
 var heart_beat_timer: float = 0.0
 var heart_beat_interval: float = 0.9  
 var hit_window: float = 0.25           
 var is_heart_striking: bool = false
 
+const BASE_HEART_INTERVAL: float = 0.9   
+const MAX_HEART_INTERVAL: float = 0.35    
+const BASE_HIT_WINDOW: float = 0.25      
+
 var ui_update_timer: float = 0.0 
 
-# --- ПЕРЕМЕННЫЕ ДЛЯ СТРОКИ И СМИ ---
+# --- NEWS TICKER & MEDIA VARIABLES ---
 var is_moving: bool = false
 var start_x: float = 0.0
 var end_x: float = 0.0
 var news_timer: float = 0.0
 
-# --- ПЕРЕМЕННЫЕ ДЛЯ ЗВУКА КАШЛЯ ---
-var cough_check_timer: float = 0.0 # Таймер проверки кашля (раз в секунду)
+# --- COUGH MECHANICS VARIABLES ---
+var cough_check_timer: float = 0.0 
 
-var cities = ["Лондон", "Токио", "Москва", "Париж", "Нью-Йорк"]
+# --- BRAIN OVERHAUL VARIABLES ---
+var bbb_resistance: float = 0.0       # Current Blood-Brain Barrier resistance (0.0 to 1.0)
+var panic_mode_active: bool = false   # Host panic state
+var panic_timer: float = 0.0          # Panic duration countdown
+
+var cities = ["London", "Tokyo", "Moscow", "Paris", "New York"]
 var background_news = [
-	"Жители города {city} массово жалуются на навязчивый шепот в голове.",
-	"Ученые в {city} зафиксировали мутацию неизвестного штамма вируса.",
-	"В {city} объявлен комендантский час из-за вспышки безумия среди населения."
+	"Citizens of {city} report massive cases of hearing an intrusive whisper in their heads.",
+	"Scientists in {city} have detected a mutation of an unknown viral strain.",
+	"Curfew declared in {city} due to a sudden outbreak of madness among the population."
 ]
 
-# --- 1. СТАРТ И НАСТРОЙКА ИНТЕРФЕЙСА ---
+# --- 1. INITIALIZATION & UI SETUP ---
 func _ready() -> void:
 	animation_player.play("fade_from_black")
 	await get_tree().process_frame
@@ -84,7 +93,7 @@ func _ready() -> void:
 
 	if log_text != null:
 		log_text.bbcode_enabled = true
-		log_text.text = "[color=red][СИСТЕМА]: Биологическая угроза запущена. Иммунная система в полной боевой готовности![/color]\n"
+		log_text.text = "[color=red][SYSTEM]: Biological threat deployed. Immune system at full combat readiness![/color]\n"
 		
 	if fade_overlay != null: fade_overlay.modulate.a = 0.0
 	if nervous_system_sprite != null: nervous_system_sprite.modulate.a = 0.0 
@@ -103,14 +112,14 @@ func _ready() -> void:
 		blood_stream_game.set("is_active", false)
 		
 	if toggle_game_button != null:
-		toggle_game_button.text = "Открыть Кровоток"
+		toggle_game_button.text = "Open Bloodstream"
 		if not toggle_game_button.pressed.is_connected(_on_toggle_game_button_pressed):
 			toggle_game_button.pressed.connect(_on_toggle_game_button_pressed)
 		
 	_update_ui_bars()
-	show_news("[color=red][СМИ]: ВОЗ объявляет о начале новой опасной пандемии.[/color]")
+	show_news("[color=red][MEDIA]: WHO announces the beginning of a dangerous new pandemic.[/color]")
 
-# --- 2. ИГРОВОЙ ЦИКЛ (КАЖДЫЙ КАДР) ---
+# --- 2. MAIN GAME LOOP (EVERY FRAME) ---
 func _process(delta: float) -> void:
 	if is_game_over: return
 	
@@ -119,11 +128,23 @@ func _process(delta: float) -> void:
 		if blood_stream_game != null and blood_stream_game.has_method("set_game_over"):
 			blood_stream_game.set_game_over()
 		_update_ui_bars()
-		add_combat_log("[color=red][КРАХ]: Носитель погиб от отказа органов. Вы проиграли.[/color]")
+		add_combat_log("[color=red][FAILURE]: Host died of organ failure. You lost.[/color]")
 		_animate_screen_fade()
 		return
 		
-	# Регенерация характеристик тела
+	# Decay Brain Barrier resistance over time
+	if bbb_resistance > 0.0:
+		bbb_resistance = max(0.0, bbb_resistance - 0.15 * delta)
+		
+	# Handle host panic state during brain assault
+	if panic_mode_active:
+		panic_timer -= delta
+		health = min(100.0, health + 1.5 * delta) # Rapid adrenaline recovery
+		if panic_timer <= 0.0:
+			panic_mode_active = false
+			add_combat_log("[color=lightblue][BRAIN]: Host's neural panic subsided. Rhythms stabilizing.[/color]")
+		
+	# Host Body Regeneration
 	rest_timer += delta
 	if rest_timer >= 6.0 and health < 100.0:
 		health = min(100.0, health + 0.4 * delta)
@@ -143,57 +164,47 @@ func _process(delta: float) -> void:
 	
 	_handle_heart_beat(delta)
 	_handle_news_ticker(delta)
-	_handle_cough_logic(delta) # Вызов логики случайного кашля
+	_handle_cough_logic(delta)
 
-# --- НОВОЕ: ЛОГИКА СЛУЧАЙНОГО КАШЛЯ С ДИНАМИЧЕСКОЙ РЕДКОСТЬЮ ---
+# --- DYNAMIC COUGH LOGIC WITH SCALING RARITY ---
 func _handle_cough_logic(delta: float) -> void:
 	if cough_player == null: return
 	
 	cough_check_timer += delta
-	# Проверяем шанс раз в 1.5 секунды, чтобы не спамить звуком
 	if cough_check_timer >= 1.5:
 		cough_check_timer = 0.0
-		
-		# Если звук уже играет, пропускаем проверку
 		if cough_player.playing: return
 		
-		# Базовый шанс кашля — 4% (0.04)
-		# Чем меньше ХП у носителя, тем выше шанс (до +15%)
 		var health_factor = (100.0 - health) / 100.0 * 0.15
-		# Чем сильнее захвачен мозг, тем выше шанс (до +15%)
 		var mind_factor = mind_control / 100.0 * 0.15
-		
 		var total_cough_chance = 0.04 + health_factor + mind_factor
 		
-		# Кидаем кубик от 0.0 до 1.0. Если выпало меньше нашего шанса — кашляем!
 		if randf() < total_cough_chance:
-			# Немного меняем питч (высоту звука) каждый раз, чтобы кашель звучал естественно и не надоедал
 			cough_player.pitch_scale = randf_range(0.85, 1.15)
 			cough_player.play()
-			add_combat_log("[color=darkred][СИМПТОМ]: У носителя зафиксирован приступ кашля.[/color]")
+			add_combat_log("[color=darkred][SYMPTOM]: Host experienced a severe coughing fit.[/color]")
 
-# --- ЛОГИКА ВКЛЮЧЕНИЯ / ВЫКЛЮЧЕНИЯ МИНИ-ИГРЫ ПО КНОПКЕ ---
+# --- BLOODSTREAM MINI-GAME TOGGLE SYSTEM ---
 func _on_toggle_game_button_pressed() -> void:
 	if is_game_over or blood_stream_game == null: return
 	
 	var should_show = not blood_stream_game.visible
-	
 	blood_stream_game.visible = should_show
 	blood_stream_game.set("is_active", should_show) 
 	
 	if toggle_game_button != null:
 		if should_show:
-			toggle_game_button.text = "Закрыть Кровоток"
-			add_combat_log("[color=darkred][СИСТЕМА]: Подключение к инъекционному порту установлено.[/color]")
+			toggle_game_button.text = "Close Bloodstream"
+			add_combat_log("[color=darkred][SYSTEM]: Connection to injection port established.[/color]")
 			if bg_music_player != null:
 				create_tween().tween_property(bg_music_player, "volume_db", -8.0, 0.5)
 		else:
-			toggle_game_button.text = "Открыть Кровоток"
-			add_combat_log("[color=gray][СИСТЕМА]: Синхронизация с кровотоком приостановлена.[/color]")
+			toggle_game_button.text = "Open Bloodstream"
+			add_combat_log("[color=gray][SYSTEM]: Bloodstream synchronization suspended.[/color]")
 			if bg_music_player != null:
 				create_tween().tween_property(bg_music_player, "volume_db", 0.0, 0.5)
 
-# --- 3. ОБРАБОТЧИКИ СИГНАЛОВ МИНИ-ИГРЫ ---
+# --- 3. MINI-GAME SIGNAL HANDLERS ---
 func _on_mini_game_dna_collected() -> void:
 	dna_points += 1
 	_update_ui_bars()
@@ -205,21 +216,21 @@ func _on_mini_game_dna_collected() -> void:
 func _on_mini_game_leukocyte_hit() -> void:
 	immunity = min(100.0, immunity + 4.0)
 	health = max(0.0, health - 2.0)
-	add_combat_log("[color=crimson][КРОВОТОК]: Атака антител! Иммунитет +4%, ХП -2.[/color]")
+	add_combat_log("[color=crimson][BLOODSTREAM]: Antibody attack! Immunity +4%, HP -2.[/color]")
 	_update_ui_bars()
 
-# --- 4. КЛИКИ ПО ОРГАНАМ ---
+# --- 4. ORGAN BUTTON INTERACTIONS ---
 func _on_intestines_button_pressed() -> void:
 	if is_game_over: return
 	var cost = 4
 	if dna_points < cost:
-		add_combat_log("[color=gray]Недостаточно ДНК! Требуется " + str(cost) + " PTS.[/color]")
+		add_combat_log("[color=gray]Not enough DNA! Requires " + str(cost) + " PTS.[/color]")
 		return
 	rest_timer = 0.0 
 	dna_points -= cost
 	health = max(0.0, health - 8.0)
 	immunity = max(0.0, immunity - 12.0) 
-	add_combat_log("[color=yellow][УДАР: КИШЕЧНИК][/color] ХП -8, Иммунитет -12%.")
+	add_combat_log("[color=yellow][ATTACK: INTESTINES][/color] HP -8, Immunity -12%.")
 	_animate_button_flash(intestines_button, Color(1.5, 0.5, 0.5))
 	_update_ui_bars()
 
@@ -227,13 +238,13 @@ func _on_liver_button_pressed() -> void:
 	if is_game_over: return
 	var cost = 8
 	if dna_points < cost:
-		add_combat_log("[color=gray]Недостаточно ДНК! Требуется " + str(cost) + " PTS.[/color]")
+		add_combat_log("[color=gray]Not enough DNA! Requires " + str(cost) + " PTS.[/color]")
 		return
 	rest_timer = 0.0
 	dna_points -= cost
 	immunity = max(0.0, immunity - 30.0) 
 	health = max(0.0, health - 12.0)     
-	add_combat_log("[color=orange][УДАР: ПЕЧЕНЬ][/color] Токсический шок! Иммунитет -30%, ХП -12.")
+	add_combat_log("[color=orange][ATTACK: LIVER][/color] Toxic shock! Immunity -30%, HP -12.")
 	_animate_button_flash(liver_button, Color(1.5, 0.5, 0.5))
 	_update_ui_bars()
 
@@ -241,36 +252,58 @@ func _on_kidneys_button_pressed() -> void:
 	if is_game_over: return
 	var cost = 5
 	if dna_points < cost:
-		add_combat_log("[color=gray]Недостаточно ДНК! Требуется " + str(cost) + " PTS.[/color]")
+		add_combat_log("[color=gray]Not enough DNA! Requires " + str(cost) + " PTS.[/color]")
 		return
 	rest_timer = 0.0
 	dna_points -= cost
 	filtration = max(0.0, filtration - 25.0)
 	health = max(0.0, health - 6.0)
-	add_combat_log("[color=orange][УДАР: ПОЧКИ][/color] Фильтрация -25%, ХП -6.")
+	add_combat_log("[color=orange][ATTACK: KIDNEYS][/color] Filtration -25%, HP -6.")
 	_animate_button_flash(kidneys_button, Color(1.5, 0.5, 0.5))
 	_update_ui_bars()
 
+# --- COMPLEX & DYNAMIC BRAIN INVASION ---
 func _on_brain_button_pressed() -> void:
 	if is_game_over: return
 	rest_timer = 0.0
+	
 	var brain_cost = 12 
 	if dna_points < brain_cost:
-		add_combat_log("[color=gray]Недостаточно ДНК! Требуется 12 PTS.[/color]")
+		add_combat_log("[color=gray]Not enough DNA! Requires 12 PTS.[/color]")
+		return
+		
+	# Check host active biological defenses
+	if immunity > 70.0 or filtration > 70.0:
+		dna_points = max(0, dna_points - 6)
+		add_combat_log("[color=crimson][WARNING]: Brain defense too high! Immune barrier incinerated -6 DNA.[/color]")
+		_animate_button_flash(brain_button, Color(1, 0, 0))
+		_update_ui_bars()
 		return
 		
 	dna_points -= brain_cost
-	health = max(0.0, health - 3.0)
+	health = max(0.0, health - 2.0)
 	
-	var base_attack = 2.5 
+	# Calculate progress penalty based on Blood-Brain Barrier (BBB) spam resistance
+	var base_attack = 3.0 
+	var bbb_penalty = 1.0 - (bbb_resistance * 0.75) 
+	
 	var immunity_resistance = (100.0 - immunity) / 100.0 
-	var filtration_bonus = (100.0 - filtration) * 0.08
+	var filtration_bonus = (100.0 - filtration) * 0.06
 	
-	var progress = base_attack + (20.0 * immunity_resistance) + filtration_bonus
+	var progress = (base_attack + (12.0 * immunity_resistance) + filtration_bonus) * bbb_penalty
 	mind_control = min(100.0, mind_control + progress)
 	
-	add_combat_log("[color=purple][ШТУРМ МОЗГА][/color] Эфлежация синапсов: " + str(snapped(progress, 0.1)) + "%")
+	# Accumulate barrier defense spike
+	bbb_resistance = min(1.0, bbb_resistance + 0.35)
+	
+	add_combat_log("[color=purple][BRAIN INVASION][/color] Progress: +" + str(snapped(progress, 0.1)) + "% (BBB Block: " + str(int(bbb_resistance * 100)) + "%)")
 	_animate_button_flash(brain_button, Color(1.8, 0.5, 1.8))
+	
+	# Trigger host psychological panic counter-attack
+	if mind_control > 40.0 and not panic_mode_active and randf() < 0.4:
+		panic_mode_active = true
+		panic_timer = 5.0 
+		add_combat_log("[color=red][CRITICAL]: Neural panic triggered! Host's heart rate destabilized![/color]")
 	
 	if nervous_system_sprite != null:
 		var target_alpha = mind_control / 100.0
@@ -279,23 +312,23 @@ func _on_brain_button_pressed() -> void:
 
 	if mind_control >= 25.0 and synapse_container != null and not synapse_container.visible:
 		synapse_container.visible = true
-		add_combat_log("[color=deeppink][НЕЙРОСЕТЬ]: Проросли в нервную систему! Доступны синапсы.[/color]")
+		add_combat_log("[color=deeppink][NERVOUS SYSTEM]: Embedded into neural path! Synapses available.[/color]")
 	
 	_update_ui_bars()
 	_check_game_conditions()
 
-# --- 5. МЕХАНИКА СЕРДЦА И СИНАПСОВ ---
+# --- 5. HEART REGULATION (DYNAMIC PULSE) & SYNAPSE ACTIONS ---
 func _on_heart_button_pressed() -> void:
 	if is_game_over: return
 	if is_heart_striking:
-		dna_points += 4 
-		add_combat_log("[color=green][ПУЛЬС]: Синхронизация! +4 ДНК.[/color]")
+		dna_points += 1 # MODIFIED: Reward is now 1 DNA point instead of 4
+		add_combat_log("[color=green][PULSE]: Synchronization! +1 DNA.[/color]")
 		_animate_button_flash(heart_button, Color(2, 1, 1))
 	else:
 		dna_points = max(0, dna_points - 3) 
 		health = max(0.0, health - 5.0)     
 		immunity = min(100.0, immunity + 8.0) 
-		add_combat_log("[color=red][ПУЛЬС]: СБОЙ! Вызван стресс! -3 ДНК, -5 ХП, Иммунитет +8%.[/color]")
+		add_combat_log("[color=red][PULSE]: ARRHYTHMIA! Induced panic stress! -3 DNA, -5 HP, Immunity +8%.[/color]")
 	_update_ui_bars()
 
 func _on_synapse_suppress_immunity_pressed() -> void:
@@ -304,9 +337,9 @@ func _on_synapse_suppress_immunity_pressed() -> void:
 	if dna_points >= cost:
 		dna_points -= cost
 		immunity = max(0.0, immunity - 25.0)
-		add_combat_log("[color=magenta][СИНАПС]: Блокада рецепторов. Иммунитет -25% (-" + str(cost) + " ДНК).[/color]")
+		add_combat_log("[color=magenta][SYNAPSE]: Receptor blockade. Immunity -25% (-" + str(cost) + " DNA).[/color]")
 	else:
-		add_combat_log("[color=gray]Недостаточно ДНК![/color]")
+		add_combat_log("[color=gray]Not enough DNA![/color]")
 	_update_ui_bars()
 
 func _on_synapse_heal_body_pressed() -> void:
@@ -315,33 +348,48 @@ func _on_synapse_heal_body_pressed() -> void:
 	if dna_points >= cost:
 		dna_points -= cost
 		health = min(100.0, health + 20.0)
-		add_combat_log("[color=cyan][СИНАПС]: Стимуляция блуждающего нерва. ХП +20% (-" + str(cost) + " ДНК).[/color]")
+		add_combat_log("[color=cyan][SYNAPSE]: Vagus nerve stimulation. HP +20% (-" + str(cost) + " DNA).[/color]")
 	else:
-		add_combat_log("[color=gray]Недостаточно ДНК![/color]")
+		add_combat_log("[color=gray]Not enough DNA![/color]")
 	_update_ui_bars()
 
-# --- 6. ВСПОМОГАТЕЛЬНЫЕ СИСТЕМЫ И КОНЕЦ ИГРЫ ---
+# --- 6. CORE SYSTEMS & END GAME CONDITIONS ---
 func _update_ui_bars() -> void:
 	if health_bar != null: health_bar.value = health
 	if mind_bar != null: mind_bar.value = mind_control
 	if immunity_bar != null: immunity_bar.value = immunity 
-	if dna_label != null: dna_label.text = "ДНК Вируса: " + str(dna_points) + " PTS"
+	if dna_label != null: dna_label.text = "Viral DNA: " + str(dna_points) + " PTS"
 
 func _handle_heart_beat(delta: float) -> void:
+	var danger_factor = (100.0 - health) / 100.0
+	
+	# In panic mode, force heart rate to maximum speed instantly
+	if panic_mode_active:
+		heart_beat_interval = MAX_HEART_INTERVAL
+		hit_window = BASE_HIT_WINDOW * 0.45
+	else:
+		# Remap interval seamlessly based on danger factor
+		heart_beat_interval = remap(danger_factor, 0.0, 1.0, BASE_HEART_INTERVAL, MAX_HEART_INTERVAL)
+		hit_window = remap(danger_factor, 0.0, 1.0, BASE_HIT_WINDOW, BASE_HIT_WINDOW * 0.45)
+	
 	heart_beat_timer += delta
 	if heart_beat_timer <= hit_window:
 		if not is_heart_striking:
 			is_heart_striking = true
 			if heart_button != null:
 				var tween = create_tween().set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
-				tween.tween_property(heart_button, "scale", Vector2(1.25, 1.25), 0.08)
+				var anim_speed = heart_beat_interval * 0.1
+				tween.tween_property(heart_button, "scale", Vector2(1.25, 1.25), anim_speed)
 	else:
 		if is_heart_striking:
 			is_heart_striking = false
 			if heart_button != null:
 				var tween = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-				tween.tween_property(heart_button, "scale", Vector2(1.0, 1.0), 0.2)
-	if heart_beat_timer >= heart_beat_interval: heart_beat_timer = 0.0
+				var anim_speed = (heart_beat_interval - hit_window) * 0.5
+				tween.tween_property(heart_button, "scale", Vector2(1.0, 1.0), anim_speed)
+				
+	if heart_beat_timer >= heart_beat_interval: 
+		heart_beat_timer = 0.0
 
 func _handle_news_ticker(delta: float) -> void:
 	if is_moving and ticker_text != null:
@@ -367,34 +415,71 @@ func _animate_button_flash(button, flash_color: Color) -> void:
 	tween.tween_property(button, "modulate", flash_color, 0.05)
 	tween.tween_property(button, "modulate", Color(1, 1, 1), 0.1)
 
+# EVALUATE VICTORY CONDITIONS
 func _check_game_conditions() -> void:
 	if mind_control >= 100.0 and not is_game_over:
 		is_game_over = true
+		panic_mode_active = false
+		
 		if blood_stream_game != null and blood_stream_game.has_method("set_game_over"):
 			blood_stream_game.set_game_over()
+		
 		_update_ui_bars()
-		add_combat_log("[color=green]ПОБЕДА! Разум полностью подчинен. Идеальный симбиоз достигнут![/color]")
-		_animate_screen_fade() 
+		_start_cinematic_finale() # Trigger biological submission finale
+
+# CINEMATIC BIOLOGICAL FINALE
+func _start_cinematic_finale() -> void:
+	add_combat_log("[color=purple][SYSTEM]: Consciousness hijacked. Erasing host ego...[/color]")
+	
+	is_moving = false
+	if ticker_text != null:
+		create_tween().tween_property(ticker_text, "modulate:a", 0.0, 1.5)
+	
+	# Turn all organ nodes into the virus's signature color shade and disable them
+	var buttons = [intestines_button, liver_button, kidneys_button, brain_button, heart_button]
+	for btn in buttons:
+		if btn != null:
+			btn.disabled = true
+			create_tween().tween_property(btn, "modulate", Color(0.5, 0.1, 0.6), 2.0)
+	
+	# Linear fade out of the ambient musical layer
+	if bg_music_player != null:
+		create_tween().tween_property(bg_music_player, "volume_db", -80.0, 3.0)
+	
+	await get_tree().create_timer(2.5).timeout
+	
+	if log_text != null:
+		log_text.text = ""
+	
+	# Sequential printing of the host's terminal thoughts
+	var final_thoughts = [
+		"[color=darkgray]The noise in my head... it's finally gone.[/color]",
+		"[color=darkgray]The thoughts aren't mine anymore. But they are so beautiful.[/color]",
+		"[color=purple]We are no longer alone. We are one.[/color]",
+		"[color=deeppink][NEURAL SYMBIOSIS ACHIEVED][/color]"
+	]
+	
+	for thought in final_thoughts:
+		add_combat_log(thought)
+		await get_tree().create_timer(2.0).timeout
+	
+	_animate_screen_fade()
 
 func _animate_screen_fade() -> void:
 	if fade_overlay == null: return
 	
 	var tween = create_tween()
-	tween.tween_property(fade_overlay, "modulate:a", 1.0, 3.0)
+	tween.tween_property(fade_overlay, "modulate:a", 1.0, 4.0)
 	
-	if bg_music_player != null:
-		var music_tween = create_tween()
-		music_tween.tween_property(bg_music_player, "volume_db", -80.0, 3.0)
-		music_tween.tween_callback(func(): bg_music_player.stop())
-		
-	# Принудительно выключаем кашель в самом конце игры
-	if cough_player != null and cough_player.playing:
-		cough_player.stop()
+	tween.tween_callback(func():
+		if bg_music_player != null: bg_music_player.stop()
+		if cough_player != null: cough_player.stop()
+	)
 
 func generate_random_news() -> void:
 	var raw = background_news.pick_random()
 	var data = {"city": cities.pick_random()}
-	show_news("[color=yellow][СМИ][/color] " + raw.format(data))
+	show_news("[color=yellow][MEDIA][/color] " + raw.format(data))
 
 func show_news(text_message: String) -> void:
 	if ticker_text == null: return
@@ -406,4 +491,3 @@ func show_news(text_message: String) -> void:
 	end_x = -ticker_text.get_content_width()
 	ticker_text.position.x = start_x
 	is_moving = true
-	print("1")

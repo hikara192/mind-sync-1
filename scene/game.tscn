@@ -1,9 +1,10 @@
-[gd_scene load_steps=105 format=3 uid="uid://camtc1r2je20t"]
+[gd_scene load_steps=106 format=3 uid="uid://camtc1r2je20t"]
 
 [ext_resource type="Texture2D" uid="uid://cqme6jcb37dwd" path="res://models/chelovek.png" id="1_33cqm"]
 [ext_resource type="Script" uid="uid://c3qmr8tn77jfy" path="res://scene/game.gd" id="1_xwcet"]
 [ext_resource type="Texture2D" uid="uid://bs53ayd2e36sy" path="res://models/back.png" id="2_ym5sv"]
 [ext_resource type="Texture2D" uid="uid://ducdyf0uahy6m" path="res://models/LOGS MON.png" id="3_81276"]
+[ext_resource type="FontFile" uid="uid://b4spsa35k0g7" path="res://models/uvKits.ttf" id="4_jhlss"]
 [ext_resource type="Texture2D" uid="uid://b4xjmvgipcpik" path="res://models/TV.png" id="4_sng2h"]
 [ext_resource type="Texture2D" uid="uid://dhigy57gumrxc" path="res://models/kishki.png" id="5_17rxn"]
 [ext_resource type="Texture2D" uid="uid://684h7dhm4qqf" path="res://models/bezinmodel.png" id="6_yq8tf"]
@@ -621,6 +622,7 @@ brain_button = NodePath("HumanSprite/BrainButton")
 layer = 100
 
 [node name="FadeRect" type="ColorRect" parent="Transition"]
+visible = false
 modulate = Color(0, 0, 0, 1)
 anchors_preset = 15
 anchor_right = 1.0
@@ -695,6 +697,12 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_sng2h")
 
 [node name="LogText" type="RichTextLabel" parent="LogPanel"]
 layout_mode = 2
+theme_override_fonts/normal_font = ExtResource("4_jhlss")
+theme_override_font_sizes/bold_italics_font_size = 18
+theme_override_font_sizes/italics_font_size = 18
+theme_override_font_sizes/mono_font_size = 18
+theme_override_font_sizes/normal_font_size = 18
+theme_override_font_sizes/bold_font_size = 18
 bbcode_enabled = true
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
@@ -708,8 +716,8 @@ frame_progress = 0.377323
 
 [node name="TickerBackground" type="PanelContainer" parent="."]
 clip_contents = true
-offset_left = 1084.0
-offset_top = 488.0
+offset_left = 1083.0
+offset_top = 504.0
 offset_right = 1732.0
 offset_bottom = 525.0
 
@@ -723,6 +731,12 @@ offset_left = -52.0
 offset_top = 1.0
 offset_right = 695.0
 offset_bottom = 260.0
+theme_override_fonts/normal_font = ExtResource("4_jhlss")
+theme_override_font_sizes/bold_italics_font_size = 18
+theme_override_font_sizes/italics_font_size = 18
+theme_override_font_sizes/mono_font_size = 18
+theme_override_font_sizes/normal_font_size = 18
+theme_override_font_sizes/bold_font_size = 18
 scroll_following = true
 
 [node name="FadeOverlay" type="ColorRect" parent="."]
@@ -815,11 +829,11 @@ texture_normal = ExtResource("8_yq8tf")
 
 [node name="KidneysButton" type="TextureButton" parent="HumanSprite"]
 layout_mode = 0
-offset_left = 126.0
-offset_top = 374.0
-offset_right = 226.0
-offset_bottom = 474.0
-scale = Vector2(1.6482, 0.890835)
+offset_left = 137.0
+offset_top = 373.0
+offset_right = 237.0
+offset_bottom = 473.0
+scale = Vector2(1.35554, 1.00286)
 texture_normal = ExtResource("9_ym5sv")
 
 [node name="ToggleGameButton" type="TextureButton" parent="."]
