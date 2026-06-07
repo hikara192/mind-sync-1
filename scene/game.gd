@@ -8,7 +8,11 @@ extends Node2D
 @export var log_text: RichTextLabel
 @export var dna_label: Label
 @export var fade_overlay: ColorRect
-@export var toggle_game_button: Button       # НОВАЯ КНОПКА: Вкл/Выкл мини-игры
+@export var toggle_game_button: Button       
+
+# --- СВЯЗЬ С ЗВУКОВОЙ СИСТЕМОЙ ---
+@export var bg_music_player: AudioStreamPlayer 
+@export var cough_player: AudioStreamPlayer    # НОВЫЙ ПЛЕЕР: Для звуков кашля
 
 # --- СВЯЗЬ С НЕРВНОЙ СИСТЕМОЙ ---
 @export var nervous_system_sprite: TextureRect 
@@ -57,6 +61,9 @@ var start_x: float = 0.0
 var end_x: float = 0.0
 var news_timer: float = 0.0
 
+# --- ПЕРЕМЕННЫЕ ДЛЯ ЗВУКА КАШЛЯ ---
+var cough_check_timer: float = 0.0 # Таймер проверки кашля (раз в секунду)
+
 var cities = ["Лондон", "Токио", "Москва", "Париж", "Нью-Йорк"]
 var background_news = [
 	"Жители города {city} массово жалуются на навязчивый шепот в голове.",
@@ -84,21 +91,21 @@ func _ready() -> void:
 	if fade_overlay != null: fade_overlay.modulate.a = 0.0
 	if nervous_system_sprite != null: nervous_system_sprite.modulate.a = 0.0 
 	if synapse_container != null: synapse_container.visible = false     
+	
+	if bg_music_player != null and not bg_music_player.playing:
+		bg_music_player.play()
 		
-	# Подключение сигналов мини-игры
 	if blood_stream_game != null:
 		if blood_stream_game.has_signal("dna_collected"):
 			blood_stream_game.dna_collected.connect(_on_mini_game_dna_collected)
 		if blood_stream_game.has_signal("leukocyte_hit"):
 			blood_stream_game.leukocyte_hit.connect(_on_mini_game_leukocyte_hit)
 		
-		# НА СТАРТЕ: Принудительно скрываем мини-игру, чтобы игрок открыл её сам
 		blood_stream_game.visible = false
 		blood_stream_game.set("is_active", false)
 		
 	if toggle_game_button != null:
 		toggle_game_button.text = "Открыть Кровоток"
-		# Подключаем клик по кнопке кодом, если ты не подключил в редакторе
 		if not toggle_game_button.pressed.is_connected(_on_toggle_game_button_pressed):
 			toggle_game_button.pressed.connect(_on_toggle_game_button_pressed)
 		
@@ -118,7 +125,7 @@ func _process(delta: float) -> void:
 		_animate_screen_fade()
 		return
 		
-	# Регенерация характеристик носителя
+	# Регенерация характеристик тела
 	rest_timer += delta
 	if rest_timer >= 6.0 and health < 100.0:
 		health = min(100.0, health + 0.4 * delta)
@@ -127,12 +134,10 @@ func _process(delta: float) -> void:
 	immunity = min(100.0, immunity + 2.2 * regen_boost * delta)
 	filtration = min(100.0, filtration + 0.5 * delta)
 	
-	# Безопасная синхронизация динамических параметров с мини-игрой
 	if blood_stream_game != null:
 		blood_stream_game.set("mind_control_ref", mind_control)
 		blood_stream_game.set("immunity_ref", immunity)
 	
-	# Обновление UI
 	ui_update_timer += delta
 	if ui_update_timer >= 0.1:
 		ui_update_timer = 0.0
@@ -140,24 +145,55 @@ func _process(delta: float) -> void:
 	
 	_handle_heart_beat(delta)
 	_handle_news_ticker(delta)
+	_handle_cough_logic(delta) # Вызов логики случайного кашля
 
-# --- НОВОЕ: ЛОГИКА ВКЛЮЧЕНИЯ / ВЫКЛЮЧЕНИЯ МИНИ-ИГРЫ ПО КНОПКЕ ---
+# --- НОВОЕ: ЛОГИКА СЛУЧАЙНОГО КАШЛЯ С ДИНАМИЧЕСКОЙ РЕДКОСТЬЮ ---
+func _handle_cough_logic(delta: float) -> void:
+	if cough_player == null: return
+	
+	cough_check_timer += delta
+	# Проверяем шанс раз в 1.5 секунды, чтобы не спамить звуком
+	if cough_check_timer >= 1.5:
+		cough_check_timer = 0.0
+		
+		# Если звук уже играет, пропускаем проверку
+		if cough_player.playing: return
+		
+		# Базовый шанс кашля — 4% (0.04)
+		# Чем меньше ХП у носителя, тем выше шанс (до +15%)
+		var health_factor = (100.0 - health) / 100.0 * 0.15
+		# Чем сильнее захвачен мозг, тем выше шанс (до +15%)
+		var mind_factor = mind_control / 100.0 * 0.15
+		
+		var total_cough_chance = 0.04 + health_factor + mind_factor
+		
+		# Кидаем кубик от 0.0 до 1.0. Если выпало меньше нашего шанса — кашляем!
+		if randf() < total_cough_chance:
+			# Немного меняем питч (высоту звука) каждый раз, чтобы кашель звучал естественно и не надоедал
+			cough_player.pitch_scale = randf_range(0.85, 1.15)
+			cough_player.play()
+			add_combat_log("[color=darkred][СИМПТОМ]: У носителя зафиксирован приступ кашля.[/color]")
+
+# --- ЛОГИКА ВКЛЮЧЕНИЯ / ВЫКЛЮЧЕНИЯ МИНИ-ИГРЫ ПО КНОПКЕ ---
 func _on_toggle_game_button_pressed() -> void:
 	if is_game_over or blood_stream_game == null: return
 	
-	# Инвертируем текущую видимость панели кровотока
 	var should_show = not blood_stream_game.visible
 	
 	blood_stream_game.visible = should_show
-	blood_stream_game.set("is_active", should_show) # Команда мини-игре спать/работать
+	blood_stream_game.set("is_active", should_show) 
 	
 	if toggle_game_button != null:
 		if should_show:
 			toggle_game_button.text = "Закрыть Кровоток"
 			add_combat_log("[color=darkred][СИСТЕМА]: Подключение к инъекционному порту установлено.[/color]")
+			if bg_music_player != null:
+				create_tween().tween_property(bg_music_player, "volume_db", -8.0, 0.5)
 		else:
 			toggle_game_button.text = "Открыть Кровоток"
 			add_combat_log("[color=gray][СИСТЕМА]: Синхронизация с кровотоком приостановлена.[/color]")
+			if bg_music_player != null:
+				create_tween().tween_property(bg_music_player, "volume_db", 0.0, 0.5)
 
 # --- 3. ОБРАБОТЧИКИ СИГНАЛОВ МИНИ-ИГРЫ ---
 func _on_mini_game_dna_collected() -> void:
@@ -171,7 +207,7 @@ func _on_mini_game_dna_collected() -> void:
 func _on_mini_game_leukocyte_hit() -> void:
 	immunity = min(100.0, immunity + 4.0)
 	health = max(0.0, health - 2.0)
-	add_combat_log("[color=crimson][КРОВОТОК]: Атака лейкоцита! Иммунитет +4%, ХП -2.[/color]")
+	add_combat_log("[color=crimson][КРОВОТОК]: Атака антител! Иммунитет +4%, ХП -2.[/color]")
 	_update_ui_bars()
 
 # --- 4. КЛИКИ ПО ОРГАНАМ ---
@@ -235,7 +271,7 @@ func _on_brain_button_pressed() -> void:
 	var progress = base_attack + (20.0 * immunity_resistance) + filtration_bonus
 	mind_control = min(100.0, mind_control + progress)
 	
-	add_combat_log("[color=purple][ШТУРМ МОЗГА][/color] Эффективность: " + str(snapped(progress, 0.1)) + "%")
+	add_combat_log("[color=purple][ШТУРМ МОЗГА][/color] Эфлежация синапсов: " + str(snapped(progress, 0.1)) + "%")
 	_animate_button_flash(brain_button, Color(1.8, 0.5, 1.8))
 	
 	if nervous_system_sprite != null:
@@ -261,7 +297,7 @@ func _on_heart_button_pressed() -> void:
 		dna_points = max(0, dna_points - 3) 
 		health = max(0.0, health - 5.0)     
 		immunity = min(100.0, immunity + 8.0) 
-		add_combat_log("[color=red][ПУЛЬС]: СБОЙ! Стресс! -3 ДНК, -5 ХП, Иммунитет +8%.[/color]")
+		add_combat_log("[color=red][ПУЛЬС]: СБОЙ! Вызван стресс! -3 ДНК, -5 ХП, Иммунитет +8%.[/color]")
 	_update_ui_bars()
 
 func _on_synapse_suppress_immunity_pressed() -> void:
@@ -286,7 +322,7 @@ func _on_synapse_heal_body_pressed() -> void:
 		add_combat_log("[color=gray]Недостаточно ДНК![/color]")
 	_update_ui_bars()
 
-# --- 6. ВСПОМОГАТЕЛЬНЫЕ СИСТЕМЫ ---
+# --- 6. ВСПОМОГАТЕЛЬНЫЕ СИСТЕМЫ И КОНЕЦ ИГРЫ ---
 func _update_ui_bars() -> void:
 	if health_bar != null: health_bar.value = health
 	if mind_bar != null: mind_bar.value = mind_control
@@ -340,11 +376,22 @@ func _check_game_conditions() -> void:
 			blood_stream_game.set_game_over()
 		_update_ui_bars()
 		add_combat_log("[color=green]ПОБЕДА! Разум полностью подчинен. Идеальный симбиоз достигнут![/color]")
-		_animate_screen_fade()
+		_animate_screen_fade() 
 
 func _animate_screen_fade() -> void:
 	if fade_overlay == null: return
-	create_tween().tween_property(fade_overlay, "modulate:a", 1.0, 3.0)
+	
+	var tween = create_tween()
+	tween.tween_property(fade_overlay, "modulate:a", 1.0, 3.0)
+	
+	if bg_music_player != null:
+		var music_tween = create_tween()
+		music_tween.tween_property(bg_music_player, "volume_db", -80.0, 3.0)
+		music_tween.tween_callback(func(): bg_music_player.stop())
+		
+	# Принудительно выключаем кашель в самом конце игры
+	if cough_player != null and cough_player.playing:
+		cough_player.stop()
 
 func generate_random_news() -> void:
 	var raw = background_news.pick_random()
