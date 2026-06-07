@@ -1,6 +1,6 @@
 extends Node2D
 
-# --- СВЯЗЬ С ИНТЕРФЕЙСОМ ---
+@onready var animation_player = $Transition/AnimationPlayer
 @export var ticker_text: RichTextLabel
 @export var clip_container: Control
 @export var log_text: RichTextLabel
@@ -71,6 +71,7 @@ var background_news = [
 
 # --- 1. СТАРТ И НАСТРОЙКА ИНТЕРФЕЙСА ---
 func _ready() -> void:
+	animation_player.play("fade_from_black")
 	await get_tree().process_frame
 	
 	health_bar = find_child("HealthBar", true, false) as ProgressBar

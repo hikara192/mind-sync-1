@@ -617,11 +617,10 @@ liver_button = NodePath("HumanSprite/LiverButton")
 kidneys_button = NodePath("HumanSprite/KidneysButton")
 brain_button = NodePath("HumanSprite/BrainButton")
 
-[node name="TransitionLayer" type="CanvasLayer" parent="."]
+[node name="Transition" type="CanvasLayer" parent="."]
 layer = 100
 
-[node name="FadeRect" type="ColorRect" parent="TransitionLayer"]
-visible = false
+[node name="FadeRect" type="ColorRect" parent="Transition"]
 modulate = Color(0, 0, 0, 1)
 anchors_preset = 15
 anchor_right = 1.0
@@ -631,7 +630,7 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(0, 0, 0, 1)
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="TransitionLayer"]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Transition"]
 libraries = {
 &"": SubResource("AnimationLibrary_jrd6n")
 }
