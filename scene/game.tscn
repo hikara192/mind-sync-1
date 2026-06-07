@@ -789,8 +789,10 @@ scale = Vector2(0.61433, 0.752733)
 texture_normal = ExtResource("13_5g16k")
 
 [node name="FadeOverlay" type="ColorRect" parent="."]
-offset_right = 1920.0
-offset_bottom = 1075.0
+offset_left = -45.0
+offset_top = -64.0
+offset_right = 1983.0
+offset_bottom = 1122.0
 mouse_filter = 2
 color = Color(0, 0, 0, 1)
 

@@ -15,7 +15,7 @@ extends Node2D
 
 # --- NERVOUS SYSTEM CONNECTIONS ---
 @export var nervous_system_sprite: TextureRect 
-@export var synapse_container: Control        
+@export var synapse_container: Control         
 
 # --- BLOODSTREAM MINI-GAME NODE ---
 @export var blood_stream_game: Control
@@ -81,7 +81,10 @@ var background_news = [
 
 # --- 1. INITIALIZATION & UI SETUP ---
 func _ready() -> void:
-	animation_player.play("fade_from_black")
+	if fade_overlay != null: 
+		fade_overlay.modulate.a = 0.0
+		fade_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	
 	await get_tree().process_frame
 	
 	health_bar = find_child("HealthBar", true, false) as ProgressBar
@@ -96,11 +99,6 @@ func _ready() -> void:
 		log_text.bbcode_enabled = true
 		log_text.text = "[color=red][SYSTEM]: Biological threat deployed. Immune system at full combat readiness![/color]\n"
 		
-	if fade_overlay != null: 
-		fade_overlay.modulate.a = 0.0
-		# FIX: Clicks will now pass through the overlay to the organ buttons below
-		fade_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		
 	if nervous_system_sprite != null: nervous_system_sprite.modulate.a = 0.0 
 	if synapse_container != null: synapse_container.visible = false     
 	
@@ -112,9 +110,9 @@ func _ready() -> void:
 		bg_music_player.play()
 		
 	if blood_stream_game != null:
-		if blood_stream_game.has_signal("dna_collected"):
+		if blood_stream_game.has_signal("dna_collected") and not blood_stream_game.dna_collected.is_connected(_on_mini_game_dna_collected):
 			blood_stream_game.dna_collected.connect(_on_mini_game_dna_collected)
-		if blood_stream_game.has_signal("leukocyte_hit"):
+		if blood_stream_game.has_signal("leukocyte_hit") and not blood_stream_game.leukocyte_hit.is_connected(_on_mini_game_leukocyte_hit):
 			blood_stream_game.leukocyte_hit.connect(_on_mini_game_leukocyte_hit)
 		
 		blood_stream_game.visible = false
@@ -187,7 +185,7 @@ func _handle_cough_logic(delta: float) -> void:
 			cough_player.play()
 			add_combat_log("[color=darkred][SYMPTOM]: Host experienced a severe coughing fit.[/color]")
 
-# --- BLOODSTREAM MINI-GAME TOG SYSTEM ---
+# --- BLOODSTREAM MINI-GAME TOGGLE SYSTEM ---
 func _on_toggle_game_button_pressed() -> void:
 	if is_game_over or blood_stream_game == null: return
 	
@@ -459,7 +457,6 @@ func _start_cinematic_finale() -> void:
 func _animate_screen_fade(reason: String) -> void:
 	if fade_overlay == null: return
 	
-	# FIX: Blocks clicks during end credits so player can't click things behind the black screen
 	fade_overlay.mouse_filter = Control.MOUSE_FILTER_STOP
 	
 	if credits_label != null:
@@ -524,6 +521,14 @@ func _run_post_game_credits(reason: String) -> void:
 			credits_label.text = "[center][color=purple]- VICTORY -[/color][/center]"
 	)
 	story_tween.tween_property(credits_label, "modulate:a", 1.0, 1.5)
+	
+	# ИСПРАВЛЕНИЕ: ВОЗВРАТ В ГЛАВНОЕ МЕНЮ
+	# Выжидаем нужные 5 секунд после отображения финальной надписи (- GAME OVER - или - VICTORY -)
+	story_tween.tween_interval(5.0)
+	story_tween.tween_callback(func():
+		# Меняем сцену на ваше главное меню. Замените путь ниже на актуальный путь к файлу вашей сцены меню!
+		get_tree().change_scene_to_file("res://scene/intro_scene.tscn")
+	)
 
 func generate_random_news() -> void:
 	var raw = background_news.pick_random()
