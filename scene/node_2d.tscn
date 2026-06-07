@@ -2,7 +2,6 @@
 
 [ext_resource type="Script" uid="uid://caq0vvxxw7fcf" path="res://scripts/mainmenu.gd" id="1_drhme"]
 [ext_resource type="Texture2D" uid="uid://dh4wwtvjytvgn" path="res://models/mainmenu/фон главный1.png" id="2_cw5uo"]
-[ext_resource type="Texture2D" uid="uid://df27s8fmgs68t" path="res://models/start.png" id="2_ppd22"]
 [ext_resource type="Texture2D" uid="uid://5sli6215bphh" path="res://models/exit.png" id="3_3cebx"]
 [ext_resource type="Texture2D" uid="uid://bsvhp26jo8qxf" path="res://models/mainmenu/фон главный2.png" id="3_x33gs"]
 [ext_resource type="Texture2D" uid="uid://x25nmkd5yspu" path="res://models/mainmenu/фон главный3.png" id="4_2paaw"]
@@ -28,6 +27,7 @@
 [ext_resource type="Texture2D" uid="uid://cenxmqor5wanb" path="res://models/mainmenu/фон главный23.png" id="24_ksd61"]
 [ext_resource type="Texture2D" uid="uid://dpykpeuj0fpag" path="res://models/mainmenu/фон главный24.png" id="25_0m7f8"]
 [ext_resource type="Texture2D" uid="uid://b70wkqst0mwyx" path="res://models/mainmenu/фон главный25.png" id="26_im0yt"]
+[ext_resource type="Texture2D" uid="uid://c1wfm2w0qwklp" path="res://models/PLAY.png" id="27_cw5uo"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_onb7f"]
 atlas = ExtResource("2_cw5uo")
@@ -219,7 +219,7 @@ script = ExtResource("1_drhme")
 position = Vector2(962, 539)
 sprite_frames = SubResource("SpriteFrames_o1eqh")
 autoplay = "default"
-frame_progress = 0.983925
+frame_progress = 0.0282996
 
 [node name="Control" type="Control" parent="."]
 layout_mode = 3
@@ -234,19 +234,20 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -91.0
-offset_top = -90.0
-offset_right = 91.0
-offset_bottom = -32.0
+offset_left = 382.0
+offset_top = -335.0
+offset_right = 556.0
+offset_bottom = -280.0
 grow_horizontal = 2
 grow_vertical = 2
+scale = Vector2(2.28223, 2.784)
 text = "start"
 
-[node name="Start" type="Sprite2D" parent="Control/start"]
+[node name="Start" type="Sprite2D" parent="Control"]
 texture_filter = 1
-position = Vector2(90, 26)
-scale = Vector2(1.35589, 0.920455)
-texture = ExtResource("2_ppd22")
+position = Vector2(1540.82, 281.52)
+scale = Vector2(6.87929, 4.34304)
+texture = ExtResource("27_cw5uo")
 
 [node name="exit" type="Button" parent="Control"]
 layout_mode = 1
@@ -255,19 +256,20 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -88.0
-offset_top = 10.0
-offset_right = 88.0
-offset_bottom = 74.0
+offset_left = 378.0
+offset_top = -27.0
+offset_right = 547.0
+offset_bottom = 34.0
 grow_horizontal = 2
 grow_vertical = 2
+scale = Vector2(2.39701, 2.49528)
 text = "exit
 "
 
-[node name="Exit" type="Sprite2D" parent="Control/exit"]
+[node name="Exit" type="Sprite2D" parent="Control"]
 texture_filter = 1
-position = Vector2(87, 31)
-scale = Vector2(1.33824, 1.08333)
+position = Vector2(1539.74, 592.344)
+scale = Vector2(6.81437, 4.19207)
 texture = ExtResource("3_3cebx")
 
 [connection signal="pressed" from="Control/start" to="." method="_on_start_pressed"]
