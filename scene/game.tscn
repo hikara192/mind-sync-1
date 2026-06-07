@@ -1,4 +1,4 @@
-[gd_scene load_steps=100 format=3 uid="uid://camtc1r2je20t"]
+[gd_scene load_steps=103 format=3 uid="uid://camtc1r2je20t"]
 
 [ext_resource type="Texture2D" uid="uid://cqme6jcb37dwd" path="res://models/chelovek.png" id="1_33cqm"]
 [ext_resource type="Script" uid="uid://c3qmr8tn77jfy" path="res://scene/game.gd" id="1_xwcet"]
@@ -17,6 +17,42 @@
 [ext_resource type="Texture2D" uid="uid://bfbfsr54t3xcb" path="res://models/pochki.png" id="9_ym5sv"]
 [ext_resource type="Script" uid="uid://050oppbvqstx" path="res://scene/BloodStreamGame.gd" id="10_ym5sv"]
 [ext_resource type="Texture2D" uid="uid://c1wfm2w0qwklp" path="res://models/PLAY.png" id="13_5g16k"]
+
+[sub_resource type="Animation" id="Animation_i6gbm"]
+resource_name = "fade_from_black"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("FadeRect:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(0, 0, 0, 1), Color(0, 0, 0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_ux4dc"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("FadeRect:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(0, 0, 0, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_jrd6n"]
+_data = {
+&"RESET": SubResource("Animation_ux4dc"),
+&"fade_from_black": SubResource("Animation_i6gbm")
+}
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qpk70"]
 bg_color = Color(0.840549, 0.348523, 0.413861, 1)
@@ -567,15 +603,71 @@ animations = [{
 [node name="Gameplay" type="Node2D" node_paths=PackedStringArray("ticker_text", "clip_container", "log_text", "dna_label", "fade_overlay", "blood_stream_game", "intestines_button", "liver_button", "kidneys_button", "brain_button")]
 script = ExtResource("1_xwcet")
 ticker_text = NodePath("TickerBackground/ClipContainer/NewsFeed")
-clip_container = NodePath("InterfaceContainer")
+clip_container = NodePath("UI/Control/InterfaceContainer")
 log_text = NodePath("LogPanel/LogText")
-dna_label = NodePath("InterfaceContainer/DnaLabel")
+dna_label = NodePath("UI/Control/InterfaceContainer/DnaLabel")
 fade_overlay = NodePath("FadeOverlay")
 blood_stream_game = NodePath("BloodStreamArea")
 intestines_button = NodePath("HumanSprite/IntestinesButton")
 liver_button = NodePath("HumanSprite/LiverButton")
 kidneys_button = NodePath("HumanSprite/KidneysButton")
 brain_button = NodePath("HumanSprite/BrainButton")
+
+[node name="TransitionLayer" type="CanvasLayer" parent="."]
+layer = 100
+
+[node name="FadeRect" type="ColorRect" parent="TransitionLayer"]
+modulate = Color(0, 0, 0, 1)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="TransitionLayer"]
+libraries = {
+&"": SubResource("AnimationLibrary_jrd6n")
+}
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="Control" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="InterfaceContainer" type="VBoxContainer" parent="UI/Control"]
+offset_left = 2.0
+offset_top = 1.0
+offset_right = 406.0
+offset_bottom = 105.0
+
+[node name="HealthBar" type="ProgressBar" parent="UI/Control/InterfaceContainer"]
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_qpk70")
+theme_override_styles/fill = SubResource("StyleBoxFlat_yq8tf")
+step = 1.0
+value = 100.0
+
+[node name="MindBar" type="ProgressBar" parent="UI/Control/InterfaceContainer"]
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_ll5lq")
+value = 100.0
+
+[node name="ImmunityBar" type="ProgressBar" parent="UI/Control/InterfaceContainer"]
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_17rxn")
+theme_override_styles/fill = SubResource("StyleBoxFlat_ym5sv")
+value = 100.0
+
+[node name="DnaLabel" type="Label" parent="UI/Control/InterfaceContainer"]
+layout_mode = 2
 
 [node name="Back" type="Sprite2D" parent="."]
 texture_filter = 1
@@ -588,33 +680,6 @@ texture_filter = 1
 position = Vector2(591, 152)
 scale = Vector2(2.76, 2.43333)
 texture = ExtResource("3_81276")
-
-[node name="InterfaceContainer" type="VBoxContainer" parent="."]
-offset_left = 2.0
-offset_top = 1.0
-offset_right = 406.0
-offset_bottom = 105.0
-
-[node name="HealthBar" type="ProgressBar" parent="InterfaceContainer"]
-layout_mode = 2
-theme_override_styles/background = SubResource("StyleBoxFlat_qpk70")
-theme_override_styles/fill = SubResource("StyleBoxFlat_yq8tf")
-step = 1.0
-value = 100.0
-
-[node name="MindBar" type="ProgressBar" parent="InterfaceContainer"]
-layout_mode = 2
-theme_override_styles/background = SubResource("StyleBoxFlat_ll5lq")
-value = 100.0
-
-[node name="ImmunityBar" type="ProgressBar" parent="InterfaceContainer"]
-layout_mode = 2
-theme_override_styles/background = SubResource("StyleBoxFlat_17rxn")
-theme_override_styles/fill = SubResource("StyleBoxFlat_ym5sv")
-value = 100.0
-
-[node name="DnaLabel" type="Label" parent="InterfaceContainer"]
-layout_mode = 2
 
 [node name="LogPanel" type="PanelContainer" parent="."]
 offset_left = 419.0
