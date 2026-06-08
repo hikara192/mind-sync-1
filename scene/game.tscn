@@ -1,4 +1,4 @@
-[gd_scene load_steps=106 format=3 uid="uid://camtc1r2je20t"]
+[gd_scene load_steps=108 format=3 uid="uid://camtc1r2je20t"]
 
 [ext_resource type="Texture2D" uid="uid://cqme6jcb37dwd" path="res://models/chelovek.png" id="1_33cqm"]
 [ext_resource type="Script" uid="uid://c3qmr8tn77jfy" path="res://scene/game.gd" id="1_xwcet"]
@@ -20,6 +20,8 @@
 [ext_resource type="Texture2D" uid="uid://c1wfm2w0qwklp" path="res://models/PLAY.png" id="13_5g16k"]
 [ext_resource type="AudioStream" uid="uid://dw8y1iwaog6ko" path="res://models/kashel.mp3" id="18_jrd6n"]
 [ext_resource type="AudioStream" uid="uid://mxjg0p0hqybe" path="res://models/untitled.mp3" id="19_jhlss"]
+[ext_resource type="Texture2D" uid="uid://5sli6215bphh" path="res://models/exit.png" id="21_ww6yf"]
+[ext_resource type="Texture2D" uid="uid://opvf54olaej2" path="res://models/skip.png" id="22_1it6f"]
 
 [sub_resource type="Animation" id="Animation_ux4dc"]
 length = 0.001
@@ -603,14 +605,18 @@ animations = [{
 "speed": 5.0
 }]
 
-[node name="Gameplay" type="Node2D" node_paths=PackedStringArray("ticker_text", "clip_container", "log_text", "dna_label", "fade_overlay", "credits_label", "bg_music_player", "cough_player", "blood_stream_game", "intestines_button", "liver_button", "kidneys_button", "brain_button")]
+[node name="Gameplay" type="Node2D" node_paths=PackedStringArray("ticker_text", "clip_container", "log_text", "dna_label", "fade_overlay", "toggle_game_button", "credits_label", "quit_game_button", "tutorial_panel", "tutorial_label", "bg_music_player", "cough_player", "blood_stream_game", "intestines_button", "liver_button", "kidneys_button", "brain_button")]
 script = ExtResource("1_xwcet")
 ticker_text = NodePath("TickerBackground/ClipContainer/NewsFeed")
 clip_container = NodePath("UI/Control/InterfaceContainer")
 log_text = NodePath("LogPanel/LogText")
 dna_label = NodePath("UI/Control/InterfaceContainer/DnaLabel")
 fade_overlay = NodePath("FadeOverlay")
+toggle_game_button = NodePath("TutorialPanel/Tutorial Button")
 credits_label = NodePath("credits_label")
+quit_game_button = NodePath("Quit Game Button")
+tutorial_panel = NodePath("TutorialPanel")
+tutorial_label = NodePath("TutorialPanel/TutorialLabel")
 bg_music_player = NodePath("BackgroundMusic")
 cough_player = NodePath("CoughPlayer")
 blood_stream_game = NodePath("BloodStreamArea")
@@ -779,6 +785,15 @@ position = Vector2(726.25, 785.25)
 scale = Vector2(3.29667, 3.44333)
 texture = ExtResource("4_sng2h")
 
+[node name="Quit Game Button" type="TextureButton" parent="."]
+texture_filter = 1
+offset_left = 1819.0
+offset_top = 3.0
+offset_right = 1889.0
+offset_bottom = 53.0
+scale = Vector2(1.40761, 1.22222)
+texture_normal = ExtResource("21_ww6yf")
+
 [node name="ToggleGameButton" type="TextureButton" parent="."]
 texture_filter = 1
 offset_left = 714.0
@@ -789,6 +804,7 @@ scale = Vector2(0.61433, 0.752733)
 texture_normal = ExtResource("13_5g16k")
 
 [node name="FadeOverlay" type="ColorRect" parent="."]
+visible = false
 offset_left = -45.0
 offset_top = -64.0
 offset_right = 1983.0
@@ -854,7 +870,8 @@ volume_db = -23.71
 
 [node name="BackgroundMusic" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("19_jhlss")
-volume_db = -24.361
+volume_db = -27.172
+bus = &"Music"
 
 [node name="credits_label" type="RichTextLabel" parent="."]
 offset_left = 578.0
@@ -870,9 +887,41 @@ theme_override_font_sizes/normal_font_size = 20
 theme_override_font_sizes/bold_font_size = 20
 bbcode_enabled = true
 
+[node name="TutorialPanel" type="Panel" parent="."]
+offset_left = 955.0
+offset_top = 289.0
+offset_right = 1864.0
+offset_bottom = 1106.0
+scale = Vector2(0.750321, 0.59767)
+
+[node name="TutorialLabel" type="RichTextLabel" parent="TutorialPanel"]
+layout_mode = 0
+offset_left = 3.0
+offset_top = 8.0
+offset_right = 902.0
+offset_bottom = 1054.0
+mouse_filter = 2
+theme_override_fonts/normal_font = ExtResource("4_jhlss")
+theme_override_font_sizes/bold_italics_font_size = 25
+theme_override_font_sizes/italics_font_size = 25
+theme_override_font_sizes/mono_font_size = 25
+theme_override_font_sizes/normal_font_size = 25
+theme_override_font_sizes/bold_font_size = 25
+
+[node name="Tutorial Button" type="Button" parent="TutorialPanel"]
+texture_filter = 1
+layout_mode = 0
+offset_left = 663.716
+offset_top = 642.495
+offset_right = 741.716
+offset_bottom = 700.495
+scale = Vector2(3.11525, 3.02816)
+icon = ExtResource("22_1it6f")
+
 [connection signal="pressed" from="ToggleGameButton" to="." method="_on_toggle_game_button_pressed"]
 [connection signal="pressed" from="HumanSprite/IntestinesButton" to="." method="_on_intestines_button_pressed"]
 [connection signal="pressed" from="HumanSprite/BrainButton" to="." method="_on_brain_button_pressed"]
 [connection signal="pressed" from="HumanSprite/HeartButton" to="." method="_on_heart_button_pressed"]
 [connection signal="pressed" from="HumanSprite/LiverButton" to="." method="_on_liver_button_pressed"]
 [connection signal="pressed" from="HumanSprite/KidneysButton" to="." method="_on_kidneys_button_pressed"]
+[connection signal="pressed" from="TutorialPanel/Tutorial Button" to="." method="_on_tutorial_button_pressed"]

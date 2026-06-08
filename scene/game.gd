@@ -7,7 +7,15 @@ extends Node2D
 @export var dna_label: Label
 @export var fade_overlay: ColorRect
 @export var toggle_game_button: Button        
-@export var credits_label: RichTextLabel  # Centered credits label variable
+@export var credits_label: RichTextLabel
+
+# --- КНОПКА ВЫХОДА ИЗ ИГРЫ (TEXTUREBUTTON) ---
+@export var quit_game_button: TextureButton
+
+# --- УЗЛЫ ДЛЯ ОБУЧЕНИЯ ---
+@export var tutorial_panel: Control
+@export var tutorial_label: RichTextLabel
+@export var tutorial_button: Button
 
 # --- AUDIO SYSTEM CONNECTIONS ---
 @export var bg_music_player: AudioStreamPlayer 
@@ -40,11 +48,15 @@ var heart_button: TextureButton
 var health: float = 100.0
 var immunity: float = 100.0      
 var filtration: float = 100.0
-var mind_control: float = 98.0  # Left at 98% for quick testing of the finale
+var mind_control: float = 0.0  
 var dna_points: int = 10         
 var rest_timer: float = 0.0      
 
 var is_game_over: bool = false
+
+# --- СОСТОЯНИЕ ОБУЧЕНИЯ ---
+var is_tutorial_active: bool = false
+var tutorial_step: int = 0
 
 # --- HEARTBEAT MECHANICS VARIABLES ---
 var heart_beat_timer: float = 0.0
@@ -68,9 +80,9 @@ var news_timer: float = 0.0
 var cough_check_timer: float = 0.0 
 
 # --- BRAIN OVERHAUL VARIABLES ---
-var bbb_resistance: float = 0.0       # Blood-Brain Barrier shield trigger: 0.0 - disabled, 1.0 - active
-var panic_mode_active: bool = false   # Host panic state
-var panic_timer: float = 0.0          # Panic duration countdown
+var bbb_resistance: float = 0.0       
+var panic_mode_active: bool = false   
+var panic_timer: float = 0.0          
 
 var cities = ["London", "Tokyo", "Moscow", "Paris", "New York"]
 var background_news = [
@@ -107,28 +119,79 @@ func _ready() -> void:
 		credits_label.visible = false
 	
 	if bg_music_player != null and not bg_music_player.playing:
+		bg_music_player.volume_db = 0.0
 		bg_music_player.play()
 		
 	if blood_stream_game != null:
-		if blood_stream_game.has_signal("dna_collected") and not blood_stream_game.dna_collected.is_connected(_on_mini_game_dna_collected):
+		if blood_stream_game.has_signal("") and not blood_stream_game.dna_collected.is_connected(_on_mini_game_dna_collected):
 			blood_stream_game.dna_collected.connect(_on_mini_game_dna_collected)
-		if blood_stream_game.has_signal("leukocyte_hit") and not blood_stream_game.leukocyte_hit.is_connected(_on_mini_game_leukocyte_hit):
+		if blood_stream_game.has_signal("") and not blood_stream_game.leukocyte_hit.is_connected(_on_mini_game_leukocyte_hit):
 			blood_stream_game.leukocyte_hit.connect(_on_mini_game_leukocyte_hit)
 		
 		blood_stream_game.visible = false
 		blood_stream_game.set("is_active", false)
 		
 	if toggle_game_button != null:
-		toggle_game_button.text = "Open Bloodstream"
+		toggle_game_button.text = ""
 		if not toggle_game_button.pressed.is_connected(_on_toggle_game_button_pressed):
 			toggle_game_button.pressed.connect(_on_toggle_game_button_pressed)
-		
+			
+	if quit_game_button != null:
+		if not quit_game_button.pressed.is_connected(_on_quit_game_button_pressed):
+			quit_game_button.pressed.connect(_on_quit_game_button_pressed)
+			
 	_update_ui_bars()
-	show_news("[color=red][MEDIA]: WHO announces the beginning of a dangerous new pandemic.[/color]")
+	show_news("")
+	
+	start_tutorial()
+
+# --- СИСТЕМА ОБУЧЕНИЯ ---
+func start_tutorial() -> void:
+	if tutorial_panel == null or tutorial_label == null:
+		push_error("ОШИБКА: Забыли перетащить панель или текст туториала в инспектор!")
+		return
+	is_tutorial_active = true
+	tutorial_step = 1
+	tutorial_panel.visible = true
+	_update_tutorial_screen()
+
+func _on_tutorial_button_pressed() -> void:
+	print("Клик по кнопке туториала зафиксирован! Текущий шаг: ", tutorial_step)
+	tutorial_step += 1
+	_update_tutorial_screen()
+
+func _update_tutorial_screen() -> void:
+	match tutorial_step:
+		1:
+			tutorial_label.text = "[center][TUTORIAL: PART 1 — OBJECTIVE]\n\nWelcome, Pathogen. Your task is to fully subjugate the host's mind (the Mind scale must reach 100%). If the host's health (HP) drops to zero before that, you will perish along with them.[/center]"
+			if mind_bar != null: mind_bar.modulate = Color(2, 1, 2)
+		2:
+			if mind_bar != null: mind_bar.modulate = Color(1, 1, 1)
+			tutorial_label.text = "[center][TUTORIAL: PART 2 — ENERGY AND DNA]\n\nYou need DNA points to evolve. Click on the Heart strictly at the moment of its contraction (pulsation) for synchronization and to receive +2 DNA. A mistaken click will cause arrhythmia and injure the host! You can also collect DNA in the mini-game — to do this, press the PLAY button on the screen.[/center]"
+			if heart_button != null: heart_button.modulate = Color(2, 1, 1)
+		3:
+			if heart_button != null: heart_button.modulate = Color(1, 1, 1)
+			tutorial_label.text = "[center][TUTORIAL: PART 3 — WEAKENING THE BODY]\n\nThe host's immune system (Immunity) protects them. Attack the Intestines, Liver, and Kidneys to reduce immunity levels and wear down the body's health.[/center]"
+			if intestines_button != null: intestines_button.modulate = Color(2, 2, 1)
+			if liver_button != null: liver_button.modulate = Color(2, 2, 1)
+		4:
+			if intestines_button != null: intestines_button.modulate = Color(1, 1, 1)
+			if liver_button != null: liver_button.modulate = Color(1, 1, 1)
+			if tutorial_button != null: tutorial_button.text = "Start Game"
+			tutorial_label.text = "[center][TUTORIAL: PART 4 — BRAIN CAPTURE]\n\nThe primary target is the Brain. But remember: its neurons are protected! You CANNOT attack the brain while the host's immunity is above 70%. Destroy the body first, then control its will. Good luck![/center]"
+			if brain_button != null: brain_button.modulate = Color(2, 1, 2)
+		_:
+			if brain_button != null: brain_button.modulate = Color(1, 1, 1)
+			if tutorial_panel != null: tutorial_panel.visible = false
+			
+			is_tutorial_active = false 
+			print("ТУТОРИАЛ ВЫКЛЮЧЕН. ИГРА НАЧАЛАСЬ!")
+			add_combat_log("[color=green][SYSTEM]: Obucchenie zaversheno. Biologicheskiy zahvat nachat![/color]")
 
 # --- 2. MAIN GAME LOOP (EVERY FRAME) ---
 func _process(delta: float) -> void:
 	if is_game_over: return
+	if is_tutorial_active: return 
 	
 	if health <= 0.0:
 		is_game_over = true
@@ -187,7 +250,7 @@ func _handle_cough_logic(delta: float) -> void:
 
 # --- BLOODSTREAM MINI-GAME TOGGLE SYSTEM ---
 func _on_toggle_game_button_pressed() -> void:
-	if is_game_over or blood_stream_game == null: return
+	if is_game_over or blood_stream_game == null or is_tutorial_active: return 
 	
 	var should_show = not blood_stream_game.visible
 	blood_stream_game.visible = should_show
@@ -197,16 +260,16 @@ func _on_toggle_game_button_pressed() -> void:
 		if should_show:
 			toggle_game_button.text = "Close Bloodstream"
 			add_combat_log("[color=darkred][SYSTEM]: Connection to injection port established.[/color]")
-			if bg_music_player != null:
-				create_tween().tween_property(bg_music_player, "volume_db", -8.0, 0.5)
 		else:
 			toggle_game_button.text = "Open Bloodstream"
 			add_combat_log("[color=gray][SYSTEM]: Bloodstream synchronization suspended.[/color]")
-			if bg_music_player != null:
-				create_tween().tween_property(bg_music_player, "volume_db", 0.0, 0.5)
+
+func _on_quit_game_button_pressed() -> void:
+	get_tree().quit()
 
 # --- 3. MINI-GAME SIGNAL HANDLERS ---
 func _on_mini_game_dna_collected() -> void:
+	if is_tutorial_active: return
 	dna_points += 1
 	_update_ui_bars()
 	if dna_label != null:
@@ -215,6 +278,7 @@ func _on_mini_game_dna_collected() -> void:
 		tween.tween_property(dna_label, "modulate", Color(1,1,1), 0.1)
 
 func _on_mini_game_leukocyte_hit() -> void:
+	if is_tutorial_active: return
 	immunity = min(100.0, immunity + 4.0)
 	health = max(0.0, health - 2.0)
 	add_combat_log("[color=crimson][BLOODSTREAM]: Antibody attack! Immunity +4%, HP -2.[/color]")
@@ -222,7 +286,7 @@ func _on_mini_game_leukocyte_hit() -> void:
 
 # --- 4. ORGAN BUTTON INTERACTIONS ---
 func _on_intestines_button_pressed() -> void:
-	if is_game_over: return
+	if is_game_over or is_tutorial_active: return
 	var cost = 4
 	if dna_points < cost:
 		add_combat_log("[color=gray]Not enough DNA! Requires " + str(cost) + " PTS.[/color]")
@@ -236,7 +300,7 @@ func _on_intestines_button_pressed() -> void:
 	_update_ui_bars()
 
 func _on_liver_button_pressed() -> void:
-	if is_game_over: return
+	if is_game_over or is_tutorial_active: return
 	var cost = 8
 	if dna_points < cost:
 		add_combat_log("[color=gray]Not enough DNA! Requires " + str(cost) + " PTS.[/color]")
@@ -250,7 +314,7 @@ func _on_liver_button_pressed() -> void:
 	_update_ui_bars()
 
 func _on_kidneys_button_pressed() -> void:
-	if is_game_over: return
+	if is_game_over or is_tutorial_active: return
 	var cost = 5
 	if dna_points < cost:
 		add_combat_log("[color=gray]Not enough DNA! Requires " + str(cost) + " PTS.[/color]")
@@ -265,9 +329,14 @@ func _on_kidneys_button_pressed() -> void:
 
 # --- BRAIN ATTACK MECHANICS ---
 func _on_brain_button_pressed() -> void:
-	if is_game_over: return
-	rest_timer = 0.0
+	if is_game_over or is_tutorial_active: return
 	
+	if immunity >= 70.0:
+		add_combat_log("[color=crimson][BRAIN BLOCKED]: Immunity too strong (" + str(int(immunity)) + "%). Reduce it below 70% to attack nervous system![/color]")
+		_animate_button_flash(brain_button, Color(0.3, 0.3, 0.3))
+		return
+		
+	rest_timer = 0.0
 	var brain_cost = 12 
 	if dna_points < brain_cost:
 		add_combat_log("[color=gray]Not enough DNA! Requires 12 PTS.[/color]")
@@ -277,7 +346,6 @@ func _on_brain_button_pressed() -> void:
 	health = max(0.0, health - 2.0)
 	
 	var progress = 5.0 
-	
 	if immunity > 50.0:
 		progress -= 1.5
 		
@@ -289,7 +357,6 @@ func _on_brain_button_pressed() -> void:
 		bbb_resistance = 1.0 
 		
 	mind_control = min(100.0, mind_control + progress)
-	
 	add_combat_log("[color=purple][BRAIN INVASION][/color] Progress: +" + str(progress) + "%. Next strike will face barrier resistance!")
 	_animate_button_flash(brain_button, Color(1.8, 0.5, 1.8))
 	
@@ -312,7 +379,7 @@ func _on_brain_button_pressed() -> void:
 
 # --- 5. HEART REGULATION (DYNAMIC PULSE) & SYNAPSE ACTIONS ---
 func _on_heart_button_pressed() -> void:
-	if is_game_over: return
+	if is_game_over or is_tutorial_active: return
 	if is_heart_striking:
 		dna_points += 2
 		add_combat_log("[color=green][PULSE]: Synchronization! +2 DNA.[/color]")
@@ -325,7 +392,7 @@ func _on_heart_button_pressed() -> void:
 	_update_ui_bars()
 
 func _on_synapse_suppress_immunity_pressed() -> void:
-	if is_game_over or mind_control < 25.0: return
+	if is_game_over or mind_control < 25.0 or is_tutorial_active: return
 	var cost = 6
 	if dna_points >= cost:
 		dna_points -= cost
@@ -336,7 +403,7 @@ func _on_synapse_suppress_immunity_pressed() -> void:
 	_update_ui_bars()
 
 func _on_synapse_heal_body_pressed() -> void:
-	if is_game_over or mind_control < 25.0: return
+	if is_game_over or mind_control < 25.0 or is_tutorial_active: return
 	var cost = 8
 	if dna_points >= cost:
 		dna_points -= cost
@@ -354,6 +421,7 @@ func _update_ui_bars() -> void:
 	if dna_label != null: dna_label.text = "Viral DNA: " + str(dna_points) + " PTS"
 
 func _handle_heart_beat(delta: float) -> void:
+	if is_tutorial_active: return 
 	var danger_factor = (100.0 - health) / 100.0
 	
 	if panic_mode_active:
@@ -383,6 +451,7 @@ func _handle_heart_beat(delta: float) -> void:
 		heart_beat_timer = 0.0
 
 func _handle_news_ticker(delta: float) -> void:
+	if is_tutorial_active: return
 	if is_moving and ticker_text != null:
 		ticker_text.position.x -= ticker_speed * delta
 		if ticker_text.position.x <= end_x:
@@ -406,22 +475,17 @@ func _animate_button_flash(button, flash_color: Color) -> void:
 	tween.tween_property(button, "modulate", flash_color, 0.05)
 	tween.tween_property(button, "modulate", Color(1, 1, 1), 0.1)
 
-# EVALUATE VICTORY CONDITIONS
 func _check_game_conditions() -> void:
 	if mind_control >= 100.0 and not is_game_over:
 		is_game_over = true
 		panic_mode_active = false
-		
 		if blood_stream_game != null and blood_stream_game.has_method("set_game_over"):
 			blood_stream_game.set_game_over()
-		
 		_update_ui_bars()
 		_start_cinematic_finale()
 
-# CINEMATIC BIOLOGICAL FINALE
 func _start_cinematic_finale() -> void:
 	add_combat_log("[color=purple][SYSTEM]: Consciousness hijacked. Erasing host ego...[/color]")
-	
 	is_moving = false
 	if ticker_text != null:
 		create_tween().tween_property(ticker_text, "modulate:a", 0.0, 1.5)
@@ -436,9 +500,7 @@ func _start_cinematic_finale() -> void:
 		create_tween().tween_property(bg_music_player, "volume_db", -80.0, 3.0)
 	
 	await get_tree().create_timer(2.5).timeout
-	
-	if log_text != null:
-		log_text.text = ""
+	if log_text != null: log_text.text = ""
 	
 	var final_thoughts = [
 		"[color=darkgray]The noise in my head... it's finally gone.[/color]",
@@ -453,36 +515,28 @@ func _start_cinematic_finale() -> void:
 	
 	_animate_screen_fade("victory")
 
-# FADE OVERLAY LOGIC AND CREDIT SYSTEM DISPATCHER
 func _animate_screen_fade(reason: String) -> void:
 	if fade_overlay == null: return
-	
 	fade_overlay.mouse_filter = Control.MOUSE_FILTER_STOP
-	
 	if credits_label != null:
 		credits_label.text = ""
 		credits_label.visible = false
 	
 	var tween = create_tween()
 	tween.tween_property(fade_overlay, "modulate:a", 1.0, 4.0)
-	
 	tween.tween_callback(func():
 		if bg_music_player != null: bg_music_player.stop()
 		if cough_player != null: cough_player.stop()
-		
 		_run_post_game_credits(reason)
 	)
 
-# ROBUST CREDITS ANIMATION SYSTEM VIA TWEEN CHAINING
 func _run_post_game_credits(reason: String) -> void:
 	if credits_label == null: return
-	
 	credits_label.visible = true
 	credits_label.bbcode_enabled = true
 	credits_label.modulate.a = 0.0
 	
 	var post_credits_lines = []
-	
 	if reason == "death":
 		post_credits_lines = [
 			"[center][color=red]The pathogen destroyed the host too quickly.[/color][/center]",
@@ -504,11 +558,8 @@ func _run_post_game_credits(reason: String) -> void:
 		]
 	
 	var story_tween = create_tween()
-	
 	for line in post_credits_lines:
-		story_tween.tween_callback(func(): 
-			credits_label.text = line
-		)
+		story_tween.tween_callback(func(): credits_label.text = line)
 		story_tween.tween_property(credits_label, "modulate:a", 1.0, 0.6)
 		story_tween.tween_interval(2.5)
 		story_tween.tween_property(credits_label, "modulate:a", 0.0, 0.6)
@@ -521,12 +572,8 @@ func _run_post_game_credits(reason: String) -> void:
 			credits_label.text = "[center][color=purple]- VICTORY -[/color][/center]"
 	)
 	story_tween.tween_property(credits_label, "modulate:a", 1.0, 1.5)
-	
-	# ИСПРАВЛЕНИЕ: ВОЗВРАТ В ГЛАВНОЕ МЕНЮ
-	# Выжидаем нужные 5 секунд после отображения финальной надписи (- GAME OVER - или - VICTORY -)
 	story_tween.tween_interval(5.0)
 	story_tween.tween_callback(func():
-		# Меняем сцену на ваше главное меню. Замените путь ниже на актуальный путь к файлу вашей сцены меню!
 		get_tree().change_scene_to_file("res://scene/intro_scene.tscn")
 	)
 
