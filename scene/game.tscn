@@ -605,7 +605,7 @@ animations = [{
 "speed": 5.0
 }]
 
-[node name="Gameplay" type="Node2D" node_paths=PackedStringArray("ticker_text", "clip_container", "log_text", "dna_label", "fade_overlay", "toggle_game_button", "credits_label", "quit_game_button", "tutorial_panel", "tutorial_label", "bg_music_player", "cough_player", "blood_stream_game", "intestines_button", "liver_button", "kidneys_button", "brain_button")]
+[node name="Gameplay" type="Node2D" node_paths=PackedStringArray("ticker_text", "clip_container", "log_text", "dna_label", "fade_overlay", "toggle_game_button", "credits_label", "quit_game_button", "tutorial_panel", "tutorial_label", "tutorial_button", "bg_music_player", "cough_player", "blood_stream_game", "intestines_button", "liver_button", "kidneys_button", "brain_button")]
 script = ExtResource("1_xwcet")
 ticker_text = NodePath("TickerBackground/ClipContainer/NewsFeed")
 clip_container = NodePath("UI/Control/InterfaceContainer")
@@ -617,6 +617,7 @@ credits_label = NodePath("credits_label")
 quit_game_button = NodePath("Quit Game Button")
 tutorial_panel = NodePath("TutorialPanel")
 tutorial_label = NodePath("TutorialPanel/TutorialLabel")
+tutorial_button = NodePath("TutorialPanel/Tutorial Button")
 bg_music_player = NodePath("BackgroundMusic")
 cough_player = NodePath("CoughPlayer")
 blood_stream_game = NodePath("BloodStreamArea")
@@ -804,7 +805,6 @@ scale = Vector2(0.61433, 0.752733)
 texture_normal = ExtResource("13_5g16k")
 
 [node name="FadeOverlay" type="ColorRect" parent="."]
-visible = false
 offset_left = -45.0
 offset_top = -64.0
 offset_right = 1983.0
@@ -911,10 +911,10 @@ theme_override_font_sizes/bold_font_size = 25
 [node name="Tutorial Button" type="Button" parent="TutorialPanel"]
 texture_filter = 1
 layout_mode = 0
-offset_left = 663.716
-offset_top = 642.495
-offset_right = 741.716
-offset_bottom = 700.495
+offset_left = 664.0
+offset_top = 642.0
+offset_right = 742.0
+offset_bottom = 700.0
 scale = Vector2(3.11525, 3.02816)
 icon = ExtResource("22_1it6f")
 
