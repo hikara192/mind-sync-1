@@ -119,7 +119,7 @@ func _ready() -> void:
 		credits_label.visible = false
 	
 	if bg_music_player != null and not bg_music_player.playing:
-		bg_music_player.volume_db = 0.0
+		bg_music_player.volume_db = -42.9
 		bg_music_player.play()
 		
 	# --- ИСПРАВЛЕННЫЙ БЛОК ИНИЦИАЛИЗАЦИИ СИГНАЛОВ МИНИ-ИГРЫ ---
