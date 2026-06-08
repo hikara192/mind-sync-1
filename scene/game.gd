@@ -164,22 +164,22 @@ func _on_tutorial_button_pressed() -> void:
 func _update_tutorial_screen() -> void:
 	match tutorial_step:
 		1:
-			tutorial_label.text = "[center][TUTORIAL: PART 1 — OBJECTIVE]\n\nWelcome, Pathogen. Your task is to fully subjugate the host's mind (the Mind scale must reach 100%). If the host's health (HP) drops to zero before that, you will perish along with them."
+			tutorial_label.text = "[TUTORIAL: PART 1 — OBJECTIVE]\n\nWelcome, Pathogen. Your task is to fully subjugate the host's mind (the Mind scale must reach 100%). If the host's health (HP) drops to zero before that, you will perish along with them."
 			if mind_bar != null: mind_bar.modulate = Color(2, 1, 2)
 		2:
 			if mind_bar != null: mind_bar.modulate = Color(1, 1, 1)
-			tutorial_label.text = "[center][TUTORIAL: PART 2 — ENERGY AND DNA]\n\nYou need DNA points to evolve. Click on the Heart strictly at the moment of its contraction (pulsation) for synchronization and to receive +2 DNA. A mistaken click will cause arrhythmia and injure the host! You can also collect DNA in the mini-game — to do this, press the PLAY button on the screen."
+			tutorial_label.text = "[TUTORIAL: PART 2 — ENERGY AND DNA]\n\nYou need DNA points to evolve. Click on the Heart strictly at the moment of its contraction (pulsation) for synchronization and to receive +2 DNA. A mistaken click will cause arrhythmia and injure the host! You can also collect DNA in the mini-game — to do this, press the PLAY button on the screen."
 			if heart_button != null: heart_button.modulate = Color(2, 1, 1)
 		3:
 			if heart_button != null: heart_button.modulate = Color(1, 1, 1)
-			tutorial_label.text = "[center][TUTORIAL: PART 3 — WEAKENING THE BODY]\n\nThe host's immune system (Immunity) protects them. Attack the Intestines, Liver, and Kidneys to reduce immunity levels and wear down the body's health."
+			tutorial_label.text = "[TUTORIAL: PART 3 — WEAKENING THE BODY]\n\nThe host's immune system (Immunity) protects them. Attack the Intestines, Liver, and Kidneys to reduce immunity levels and wear down the body's health."
 			if intestines_button != null: intestines_button.modulate = Color(2, 2, 1)
 			if liver_button != null: liver_button.modulate = Color(2, 2, 1)
 		4:
 			if intestines_button != null: intestines_button.modulate = Color(1, 1, 1)
 			if liver_button != null: liver_button.modulate = Color(1, 1, 1)
 			if tutorial_button != null: tutorial_button.text = ""
-			tutorial_label.text = "[center][TUTORIAL: PART 4 — BRAIN CAPTURE]\n\nThe primary target is the Brain. But remember: its neurons are protected! You CANNOT attack the brain while the host's immunity is above 70%. Destroy the body first, then control its will. Good luck!"
+			tutorial_label.text = "[TUTORIAL: PART 4 — BRAIN CAPTURE]\n\nThe primary target is the Brain. But remember: its neurons are protected! You CANNOT attack the brain while the host's immunity is above 70%. Destroy the body first, then control its will. Good luck!"
 			if brain_button != null: brain_button.modulate = Color(2, 1, 2)
 		_:
 			if brain_button != null: brain_button.modulate = Color(1, 1, 1)

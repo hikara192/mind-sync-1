@@ -805,6 +805,7 @@ scale = Vector2(0.61433, 0.752733)
 texture_normal = ExtResource("13_5g16k")
 
 [node name="FadeOverlay" type="ColorRect" parent="."]
+visible = false
 offset_left = -45.0
 offset_top = -64.0
 offset_right = 1983.0
@@ -917,6 +918,12 @@ offset_right = 742.0
 offset_bottom = 700.0
 scale = Vector2(3.11525, 3.02816)
 icon = ExtResource("22_1it6f")
+
+[node name="Skip" type="Sprite2D" parent="TutorialPanel"]
+texture_filter = 1
+position = Vector2(786.33, 731.172)
+scale = Vector2(3.96021, 4.2833)
+texture = ExtResource("22_1it6f")
 
 [connection signal="pressed" from="ToggleGameButton" to="." method="_on_toggle_game_button_pressed"]
 [connection signal="pressed" from="HumanSprite/IntestinesButton" to="." method="_on_intestines_button_pressed"]
