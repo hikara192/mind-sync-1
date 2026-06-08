@@ -93,6 +93,10 @@ var background_news = [
 
 # --- 1. INITIALIZATION & UI SETUP ---
 func _ready() -> void:
+	# Запускаем анимацию проявления, если AnimationPlayer существует
+	if animation_player != null and animation_player.has_animation("fade_from_black"):
+		animation_player.play("fade_from_black")
+
 	if fade_overlay != null: 
 		fade_overlay.modulate.a = 0.0
 		fade_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE

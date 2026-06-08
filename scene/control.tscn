@@ -480,7 +480,7 @@ bbcode_enabled = true
 
 [node name="TypeSound" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("4_8g54p")
-volume_db = -11.245
+volume_db = -18.178
 
 [node name="BGMPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("5_j0f1v")

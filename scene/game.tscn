@@ -630,7 +630,6 @@ brain_button = NodePath("HumanSprite/BrainButton")
 layer = 100
 
 [node name="FadeRect" type="ColorRect" parent="Transition"]
-visible = false
 modulate = Color(0, 0, 0, 1)
 anchors_preset = 15
 anchor_right = 1.0
@@ -871,7 +870,6 @@ volume_db = -23.71
 [node name="BackgroundMusic" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("19_jhlss")
 volume_db = -27.172
-bus = &"Music"
 
 [node name="credits_label" type="RichTextLabel" parent="."]
 offset_left = 578.0
